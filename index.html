@@ -448,7 +448,8 @@
             const file = event.target.files[0];
             if (!file) return;
             
-            uploadedFileName = file.name;
+            // Strip the file extension (e.g., .xlsx, .csv) for a cleaner title display
+            uploadedFileName = file.name.replace(/\.[^/.]+$/, "");
             updateUI(); // Instantly update title to show filename
             
             const reader = new FileReader();
