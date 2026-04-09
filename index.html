@@ -69,6 +69,31 @@
             font-weight: bold;
             text-transform: uppercase;
         }
+
+        /* Print and PDF Export Styles */
+        @media print {
+            body {
+                background-color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .no-print {
+                display: none !important;
+            }
+            /* Expand scrollable areas so all content prints */
+            #quotes-container, #quotes-container-2, #quotes-container-3 {
+                height: auto !important;
+                overflow: visible !important;
+                max-height: none !important;
+            }
+            /* Prevent breaking inside cards */
+            .bg-white, .bg-slate-50, .bg-rose-50, .bg-teal-50 {
+                break-inside: avoid;
+            }
+            /* Reduce top margin for printing */
+            body { padding: 0 !important; }
+            .max-w-6xl { max-width: 100% !important; margin: 0 !important; }
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -80,7 +105,11 @@
                 <h1 id="ui-title" class="text-3xl font-bold text-slate-800">FUAT Dashboard</h1>
                 <p id="ui-subtitle" class="text-slate-500">Follow-Up After Training Analysis</p>
             </div>
-            <div class="flex gap-3">
+            <div class="flex flex-wrap gap-3 no-print">
+                <button onclick="window.print()" class="px-4 py-2 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all font-semibold text-slate-700 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    <span id="ui-print-btn">Print / PDF</span>
+                </button>
                 <button onclick="toggleLanguage()" class="px-4 py-2 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all font-semibold text-slate-700 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                     <span id="lang-label">Lao</span>
@@ -309,6 +338,7 @@
                 title: "FUAT Dashboard",
                 subtitle: "Follow-Up After Training Analysis",
                 upload: "Upload Excel",
+                printBtn: "Print / PDF",
                 province: "Province",
                 district: "District",
                 allProv: "All Provinces",
@@ -352,9 +382,10 @@
                 ai3P3_2: " requested support examples highlighted below."
             },
             lo: {
-                title: "ແຜງຄວບຄຸມ FUAT",
+                title: "ກະດານສະແດງຜົນ FUAT",
                 subtitle: "ການວິເຄາະຕິດຕາມພາຍຫຼັງການຝຶກອົບຮົມ",
                 upload: "ອັບໂຫລດ Excel",
+                printBtn: "ພິມ / PDF",
                 province: "ແຂວງ",
                 district: "ເມືອງ",
                 allProv: "ທຸກແຂວງ",
@@ -411,6 +442,7 @@
             document.getElementById('ui-title').innerText = titleDisplay;
             document.getElementById('ui-subtitle').innerText = t.subtitle;
             document.getElementById('ui-upload-btn').innerText = t.upload;
+            document.getElementById('ui-print-btn').innerText = t.printBtn;
             document.getElementById('ui-filter-province').innerText = t.province;
             document.getElementById('ui-filter-district').innerText = t.district;
             document.getElementById('ui-gender-title').innerText = t.genderDist;
