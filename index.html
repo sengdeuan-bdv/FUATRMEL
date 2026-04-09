@@ -511,7 +511,7 @@
         }
 
         function populateProvinces() {
-            const ps = ["Phongsaly", "Oudomxay", "Savannakhet", "Salavan", "Sekong"];
+            const ps = ["Phongsaly", "Oudomxay", "Vientiane Capital", "Savannakhet", "Salavan", "Sekong"];
             const sel = document.getElementById('filter-province');
             sel.innerHTML = `<option value="">${i18n[currentLang].allProv}</option>`;
             ps.forEach(p => { const o = document.createElement('option'); o.value = p; o.innerText = p; sel.appendChild(o); });
