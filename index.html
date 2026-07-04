@@ -114,6 +114,18 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                     <span id="lang-label">Lao</span>
                 </button>
+                <button onclick="exportToExcel()" class="px-4 py-2 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all font-semibold text-emerald-700 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+                    <span id="ui-export-excel-btn">Export Excel</span>
+                </button>
+                <button onclick="exportToWord()" class="px-4 py-2 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all font-semibold text-blue-700 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="10" y2="17"/><line x1="12" y1="13" x2="12" y2="17"/><line x1="15" y1="13" x2="14" y2="17"/></svg>
+                    <span id="ui-export-word-btn">Export Word</span>
+                </button>
+                <button onclick="openGuideModal()" class="px-4 py-2 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all font-semibold text-slate-700 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    <span id="ui-guide-btn">User Guide</span>
+                </button>
                 <label class="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-all font-semibold flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                     <span id="ui-upload-btn">Upload Excel</span>
@@ -122,19 +134,58 @@
             </div>
         </header>
 
-        <!-- Filters Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+        <!-- Upload Message (error/warning) -->
+        <div id="upload-message" class="hidden mb-6 p-4 rounded-xl border text-sm font-semibold no-print"></div>
+
+        <!-- Filters Section (multi-select checkbox dropdowns) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 relative ms-dropdown" data-ms-key="province">
                 <label id="ui-filter-province" class="block text-sm font-semibold text-slate-600 mb-2">Province</label>
-                <select id="filter-province" onchange="updateDistricts()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    <option value="">All Provinces</option>
-                </select>
+                <button type="button" onclick="toggleMsDropdown('province')" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all flex items-center justify-between text-left">
+                    <span id="ms-province-label" class="text-slate-400 truncate">All Provinces</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 ml-2 text-slate-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div id="ms-province-panel" class="hidden absolute z-20 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-56 overflow-y-auto"></div>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 relative ms-dropdown" data-ms-key="district">
                 <label id="ui-filter-district" class="block text-sm font-semibold text-slate-600 mb-2">District</label>
-                <select id="filter-district" onchange="applyFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    <option value="">All Districts</option>
-                </select>
+                <button type="button" onclick="toggleMsDropdown('district')" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all flex items-center justify-between text-left">
+                    <span id="ms-district-label" class="text-slate-400 truncate">All Districts</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 ml-2 text-slate-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div id="ms-district-panel" class="hidden absolute z-20 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-56 overflow-y-auto"></div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 relative ms-dropdown" data-ms-key="training">
+                <label id="ui-filter-training" class="block text-sm font-semibold text-slate-600 mb-2">Training (207)</label>
+                <button type="button" onclick="toggleMsDropdown('training')" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all flex items-center justify-between text-left">
+                    <span id="ms-training-label" class="text-slate-400 truncate">All Trainings</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 ml-2 text-slate-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div id="ms-training-panel" class="hidden absolute z-20 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-56 overflow-y-auto"></div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 relative ms-dropdown" data-ms-key="trainingOption">
+                <label id="ui-filter-training-option" class="block text-sm font-semibold text-slate-600 mb-2">Training Option (Q207)</label>
+                <button type="button" onclick="toggleMsDropdown('trainingOption')" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all flex items-center justify-between text-left">
+                    <span id="ms-trainingOption-label" class="text-slate-400 truncate">All Options</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 ml-2 text-slate-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div id="ms-trainingOption-panel" class="hidden absolute z-20 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-56 overflow-y-auto"></div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 relative ms-dropdown" data-ms-key="trainingOther">
+                <label id="ui-filter-training-other" class="block text-sm font-semibold text-slate-600 mb-2">Other Training (207a)</label>
+                <button type="button" onclick="toggleMsDropdown('trainingOther')" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all flex items-center justify-between text-left">
+                    <span id="ms-trainingOther-label" class="text-slate-400 truncate">All Others</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 ml-2 text-slate-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div id="ms-trainingOther-panel" class="hidden absolute z-20 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-56 overflow-y-auto"></div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 relative ms-dropdown" data-ms-key="facilityType">
+                <label id="ui-filter-facility-type" class="block text-sm font-semibold text-slate-600 mb-2">Facility Type (205)</label>
+                <button type="button" onclick="toggleMsDropdown('facilityType')" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all flex items-center justify-between text-left">
+                    <span id="ms-facilityType-label" class="text-slate-400 truncate">All Facility Types</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 ml-2 text-slate-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div id="ms-facilityType-panel" class="hidden absolute z-20 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-56 overflow-y-auto"></div>
             </div>
         </div>
 
@@ -202,6 +253,30 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- AI Theme Generation Controls -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 mb-8 no-print">
+                <div class="flex flex-col md:flex-row gap-3 items-start md:items-end">
+                    <div class="flex-1 w-full">
+                        <label id="ui-gemini-key-label" class="block text-sm font-semibold text-slate-600 mb-2">Gemini API Key</label>
+                        <input type="password" id="gemini-api-key" placeholder="AIzaSy..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-purple-500 transition-all" oninput="saveGeminiSettings()">
+                    </div>
+                    <div class="w-full md:w-56">
+                        <label id="ui-gemini-model-label" class="block text-sm font-semibold text-slate-600 mb-2">Model</label>
+                        <input type="text" id="gemini-model" value="gemini-2.0-flash" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-purple-500 transition-all" oninput="saveGeminiSettings()">
+                    </div>
+                    <button onclick="generateAllAiThemes()" id="ai-generate-btn" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg shadow-md hover:opacity-90 transition-all font-semibold flex items-center gap-2 whitespace-nowrap w-full md:w-auto justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M3 12h4M12 21v-4M21 12h-4M5.6 5.6l2.8 2.8M18.4 5.6l-2.8 2.8M5.6 18.4l2.8-2.8M18.4 18.4l-2.8-2.8"/></svg>
+                        <span id="ui-ai-generate-btn">Generate AI Themes</span>
+                    </button>
+                    <button onclick="generateAllLocalAutoThemes()" id="local-auto-generate-btn" class="px-4 py-2 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all font-semibold text-slate-700 flex items-center gap-2 whitespace-nowrap w-full md:w-auto justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <span id="ui-local-auto-generate-btn">Auto-Discover Themes (Local)</span>
+                    </button>
+                </div>
+                <p id="ai-status" class="text-xs text-slate-400 mt-2"></p>
+                <p id="local-auto-status" class="text-xs text-slate-400 mt-1"></p>
             </div>
 
             <!-- Section 1 Detail -->
@@ -327,11 +402,254 @@
         </div>
     </div>
 
+    <!-- User Guide Modal -->
+    <div id="guide-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 no-print" onclick="if(event.target===this) closeGuideModal()">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between p-6 border-b border-slate-100 shrink-0">
+                <h2 id="ui-guide-title" class="text-xl font-bold text-slate-800">User Guide</h2>
+                <button onclick="closeGuideModal()" class="text-slate-400 hover:text-slate-700 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div id="guide-content" class="p-6 overflow-y-auto text-slate-700 leading-relaxed"></div>
+        </div>
+    </div>
+
     <script>
         // Empty State variables and i18n config
         let rawData = [];
         let currentLang = 'en';
         let uploadedFileName = '';
+
+        // Canonical field names used throughout the dashboard. Real-world exports often
+        // prefix/reword these questions (e.g. "203. please select the province of your
+        // work location."), so normalizeColumnNames() below resolves those to these keys.
+        const COL = {
+            province: 'province',
+            district: 'district',
+            gender: 'gender',
+            appliedSkill: 'skill knowledge using',
+            exampleApplied: 'example of how you have applied that skill or knowledge in your work?',
+            whyNotApplied: 'why do you think you were not able to apply those skills or knowledge in your work or at your organization?',
+            supportNeeded: 'what kind of support would you need to apply those skills or knowledge in your work?',
+            trainingReceived: 'recent training you received from jsi',
+            trainingOption: 'q207option',
+            trainingOtherSpecify: '207a. other',
+            facilityType: 'work location is a provincial health office or a district health office'
+        };
+
+        // Shared visual styles for theme cards (local keyword-based AND AI-generated)
+        const styleSets = [
+            { bg: 'bg-purple-50', border: 'border-purple-100', text: 'text-purple-800', badgeBg: 'bg-purple-200', kwText: 'text-purple-500' },
+            { bg: 'bg-blue-50', border: 'border-blue-100', text: 'text-blue-800', badgeBg: 'bg-blue-200', kwText: 'text-blue-500' },
+            { bg: 'bg-emerald-50', border: 'border-emerald-100', text: 'text-emerald-800', badgeBg: 'bg-emerald-200', kwText: 'text-emerald-500' },
+            { bg: 'bg-amber-50', border: 'border-amber-100', text: 'text-amber-800', badgeBg: 'bg-amber-200', kwText: 'text-amber-500' },
+            { bg: 'bg-rose-50', border: 'border-rose-100', text: 'text-rose-800', badgeBg: 'bg-rose-200', kwText: 'text-rose-500' },
+            { bg: 'bg-slate-50', border: 'border-slate-200', text: 'text-slate-700', badgeBg: 'bg-slate-200', kwText: 'text-slate-500' },
+            { bg: 'bg-cyan-50', border: 'border-cyan-100', text: 'text-cyan-800', badgeBg: 'bg-cyan-200', kwText: 'text-cyan-500' },
+            { bg: 'bg-orange-50', border: 'border-orange-100', text: 'text-orange-800', badgeBg: 'bg-orange-200', kwText: 'text-orange-500' },
+            { bg: 'bg-teal-50', border: 'border-teal-100', text: 'text-teal-800', badgeBg: 'bg-teal-200', kwText: 'text-teal-500' }
+        ];
+
+        // Shared helpers for theme categorization (used by local-keyword AND local-auto-discover rendering)
+        function computeThemeCounts(texts, themes) {
+            const otherTheme = themes[themes.length - 1];
+            let counts = {};
+            themes.forEach(t => counts[t.id] = 0);
+            texts.forEach(text => {
+                const lower = text.toLowerCase();
+                let bestTheme = otherTheme.id;
+                let maxMatches = 0;
+                themes.forEach(theme => {
+                    if (theme.id === otherTheme.id) return;
+                    let matches = theme.kws.filter(kw => lower.includes(kw.toLowerCase())).length;
+                    if (matches > maxMatches) { maxMatches = matches; bestTheme = theme.id; }
+                });
+                if (maxMatches === 0) {
+                    let otherMatches = otherTheme.kws.filter(kw => lower.includes(kw.toLowerCase())).length;
+                    if (otherMatches > 0) bestTheme = otherTheme.id;
+                }
+                counts[bestTheme]++;
+            });
+            return counts;
+        }
+
+        function renderThemeCards(themes, counts, styleOffset, keywordsLabel, modBase) {
+            const otherTheme = themes[themes.length - 1];
+            let sorted = themes.filter(t => t.id !== otherTheme.id).sort((a, b) => counts[b.id] - counts[a.id]);
+            sorted.push(otherTheme);
+            const base = modBase || styleSets.length;
+
+            let html = `<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">`;
+            sorted.forEach((theme, index) => {
+                const count = counts[theme.id];
+                if (count === 0) return;
+
+                const style = styleSets[(index + styleOffset) % base];
+                const title = currentLang === 'en' ? theme.en : theme.lo;
+                const kwText = currentLang === 'en'
+                    ? theme.kws.filter(k => /^[a-zA-Z\s\-]+$/.test(k)).join(', ') || theme.kws.join(', ')
+                    : theme.kws.filter(k => !/^[a-zA-Z\s\-]+$/.test(k)).join(', ') || theme.kws.join(', ');
+
+                html += `
+                    <div class="p-3 ${style.bg} rounded-xl border ${style.border} shadow-sm flex flex-col justify-between">
+                        <div class="flex justify-between items-start mb-2 gap-2">
+                            <span class="font-bold ${style.text} text-xs leading-snug">${title}</span>
+                            <span class="${style.badgeBg} ${style.text} py-0.5 px-2.5 rounded-full text-[10px] font-black shrink-0">${count}</span>
+                        </div>
+                        <p class="text-[9px] ${style.kwText} uppercase tracking-wider font-bold mt-1 leading-tight line-clamp-2" title="${kwText}">${keywordsLabel} ${kwText}</p>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            return html;
+        }
+
+        function pickBestSentences(texts, themes) {
+            const combinedKeywords = themes.map(t => t.kws).flat();
+            let scored = texts.map(text => {
+                const lowerText = text.toLowerCase();
+                let score = 0;
+                combinedKeywords.forEach(kw => { if (lowerText.includes(kw.toLowerCase())) score++; });
+                return { text, score };
+            }).filter(item => item.text.length > 30 && item.text.length < 500);
+
+            scored.sort((a, b) => b.score - a.score || b.text.length - a.text.length);
+            let best = [...new Set(scored.map(item => item.text))].slice(0, 3);
+            if (best.length === 0 && texts.length > 0) {
+                best = [...new Set(texts)].sort((a, b) => b.length - a.length).slice(0, 3);
+            }
+            return best;
+        }
+
+        function renderFullSentenceBox(sentences, repLabel, opts) {
+            if (sentences.length === 0) return '';
+            const list = sentences.map(s => `<p class="text-slate-800 italic font-medium leading-relaxed mb-4 pb-4 border-b ${opts.borderColor} last:mb-0 last:pb-0 last:border-0">"${s}"</p>`).join('');
+            return `<div class="mt-4 p-5 bg-gradient-to-r ${opts.gradient} rounded-xl border ${opts.boxBorder} shadow-inner"><p class="text-[10px] font-bold ${opts.accentText} uppercase tracking-widest mb-3 flex items-center gap-2">${opts.icon}${repLabel} (Top ${sentences.length})</p>${list}</div>`;
+        }
+
+        function renderQuoteCards(container, quotes, noQuotesText, footerLabel) {
+            container.innerHTML = '';
+            if (quotes.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 text-center py-10">${noQuotesText}</p>`;
+                return;
+            }
+            quotes.forEach(q => {
+                const div = document.createElement('div');
+                div.className = 'bg-white p-4 rounded-2xl border border-slate-100 shadow-sm';
+                div.innerHTML = `
+                    <p class="text-slate-600 text-sm leading-relaxed">"${q}"</p>
+                    <div class="mt-2 text-[10px] font-bold text-slate-300 uppercase tracking-tighter">${footerLabel}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // -------------------------------------------------------------
+        // MULTI-SELECT FILTERS (checkbox dropdown + tag-style summary label)
+        // -------------------------------------------------------------
+
+        const filterState = {
+            province: [],
+            district: [],
+            training: [],
+            trainingOption: [],
+            trainingOther: [],
+            facilityType: []
+        };
+
+        const MS_ALL_LABEL_KEYS = {
+            province: 'allProv',
+            district: 'allDist',
+            training: 'allTrainings',
+            trainingOption: 'allTrainingOptions',
+            trainingOther: 'allOther',
+            facilityType: 'allFacilityTypes'
+        };
+
+        function populateMsFilter(key, values, allLabel) {
+            const panel = document.getElementById(`ms-${key}-panel`);
+            const rows = values.map(v => {
+                const safeV = escapeHtml(v);
+                const checked = filterState[key].includes(v) ? 'checked' : '';
+                return `
+                    <label class="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 cursor-pointer text-sm text-slate-700">
+                        <input type="checkbox" value="${safeV}" ${checked} onchange="toggleMsValue('${key}', this.value, this.checked)" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                        <span class="truncate">${safeV}</span>
+                    </label>
+                `;
+            }).join('');
+
+            panel.innerHTML = `
+                <div class="flex items-center justify-between px-3 py-2 border-b border-slate-100 sticky top-0 bg-white">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">${values.length}</span>
+                    <button type="button" onclick="clearMsFilter('${key}')" class="text-[10px] font-bold text-blue-600 hover:underline">${i18n[currentLang].clearFilterLabel}</button>
+                </div>
+                ${rows || `<div class="px-3 py-4 text-sm text-slate-400 text-center">-</div>`}
+            `;
+            updateMsLabel(key, allLabel);
+        }
+
+        function updateMsLabel(key, allLabel) {
+            const labelEl = document.getElementById(`ms-${key}-label`);
+            if (!labelEl) return;
+            const selected = filterState[key];
+            if (selected.length === 0) {
+                labelEl.textContent = allLabel;
+                labelEl.className = 'text-slate-400 truncate';
+            } else if (selected.length <= 2) {
+                labelEl.textContent = selected.join(', ');
+                labelEl.className = 'text-slate-700 truncate';
+            } else {
+                labelEl.textContent = `${selected.length}${i18n[currentLang].selectedSuffix}`;
+                labelEl.className = 'text-slate-700 truncate';
+            }
+        }
+
+        function toggleMsValue(key, value, checked) {
+            if (checked) {
+                if (!filterState[key].includes(value)) filterState[key].push(value);
+            } else {
+                filterState[key] = filterState[key].filter(v => v !== value);
+            }
+            updateMsLabel(key, i18n[currentLang][MS_ALL_LABEL_KEYS[key]]);
+
+            if (key === 'province') {
+                updateDistricts();
+            } else {
+                applyFilters();
+            }
+        }
+
+        function clearMsFilter(key) {
+            filterState[key] = [];
+            const panel = document.getElementById(`ms-${key}-panel`);
+            panel.querySelectorAll('input[type=checkbox]').forEach(cb => { cb.checked = false; });
+            updateMsLabel(key, i18n[currentLang][MS_ALL_LABEL_KEYS[key]]);
+
+            if (key === 'province') {
+                updateDistricts();
+            } else {
+                applyFilters();
+            }
+        }
+
+        function toggleMsDropdown(key) {
+            const panel = document.getElementById(`ms-${key}-panel`);
+            const isHidden = panel.classList.contains('hidden');
+            closeAllMsDropdowns();
+            if (isHidden) panel.classList.remove('hidden');
+        }
+
+        function closeAllMsDropdowns() {
+            Object.keys(filterState).forEach(key => {
+                document.getElementById(`ms-${key}-panel`)?.classList.add('hidden');
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.ms-dropdown')) closeAllMsDropdowns();
+        });
 
         const i18n = {
             en: {
@@ -339,10 +657,37 @@
                 subtitle: "Follow-Up After Training Analysis",
                 upload: "Upload Excel",
                 printBtn: "Print / PDF",
+                exportExcelBtn: "Export Excel",
+                exportWordBtn: "Export Word",
+                guideBtn: "User Guide",
+                guideTitle: "User Guide",
+                exportNoData: "Please upload data first before exporting.",
+                reportTitle: "FUAT Dashboard — Narrative Report",
+                reportGenerated: "Generated",
+                reportRespondents: "Respondents in current filter",
+                reportMetric: "Metric",
+                reportValue: "Value",
+                reportTotalRespondents: "Total Respondents",
+                reportGenderSplit: "Male / Female",
+                reportAppliedSkills: "Applied Skills (Yes)",
+                reportThemesHeading: "Identified Themes",
+                reportNoThemes: "No themes identified.",
+                reportQuotesHeading: "Representative Responses",
+                reportNoQuotes: "No responses available.",
                 province: "Province",
                 district: "District",
                 allProv: "All Provinces",
                 allDist: "All Districts",
+                filterTraining: "Training (207)",
+                filterTrainingOption: "Training Option (Q207)",
+                filterTrainingOther: "Other Training (207a)",
+                allTrainings: "All Trainings",
+                allTrainingOptions: "All Options",
+                allOther: "All Others",
+                filterFacilityType: "Facility Type (205)",
+                allFacilityTypes: "All Facility Types",
+                clearFilterLabel: "Clear",
+                selectedSuffix: " selected",
                 genderDist: "Gender Dist.",
                 appliedTitle: "Skill Usage",
                 male: "Male",
@@ -379,17 +724,68 @@
                 ai3P1: "Gemini Analysis: When asked about future needs, ",
                 ai3P2: " individuals articulated specific requests for assistance.",
                 ai3P3_1: "The primary needs are captured by ",
-                ai3P3_2: " requested support examples highlighted below."
+                ai3P3_2: " requested support examples highlighted below.",
+                errReadFail: "Failed to read the file. Please try again.",
+                errNoSheet: "The file does not contain any readable sheet.",
+                errParseFail: "Could not parse this file. Please make sure it is a valid Excel or CSV file.",
+                errEmptyFile: "The file appears to be empty. Please upload a file with data rows.",
+                errMissingCols: "Warning: the following expected columns were not found in the file:",
+                aiGenerateBtn: "Generate AI Themes",
+                aiMissingKey: "Please enter your Gemini API key above.",
+                aiNoData: "No text responses available to analyze for the current filter.",
+                aiGenerating: "Analyzing responses with Gemini... this may take a moment.",
+                aiSuccess: "AI themes generated successfully.",
+                aiErrorKey: "Invalid or unauthorized API key. Please check your Gemini API key.",
+                aiErrorRateLimit: "Gemini API rate limit reached. Please wait a moment and try again.",
+                aiErrorModel: "Model not found. Please check the model name.",
+                aiErrorParse: "Received an unexpected response from Gemini. Please try again.",
+                aiErrorGeneric: "Something went wrong while contacting Gemini. Please try again.",
+                aiThemeQuotesLabel: "AI-Identified Example Quotes",
+                localAutoBtn: "Auto-Discover Themes (Local)",
+                localAutoRunning: "Scanning responses for recurring phrases (offline, no data leaves your browser)...",
+                localAutoSuccess: "Local auto-discovered themes generated.",
+                localAutoNoData: "No text responses available to analyze for the current filter.",
+                localAutoSummary: "Local analysis (no AI/internet used) of ",
+                localAutoSummary2: " responses found the following auto-detected recurring phrases:",
+                localAutoQuotesLabel: "Example Responses Containing These Phrases",
+                localOtherLabel: "Others / No Recurring Phrase"
             },
             lo: {
                 title: "ກະດານສະແດງຜົນ FUAT",
                 subtitle: "ການວິເຄາະຕິດຕາມພາຍຫຼັງການຝຶກອົບຮົມ",
                 upload: "ອັບໂຫລດ Excel",
                 printBtn: "ພິມ / PDF",
+                exportExcelBtn: "ສົ່ງອອກ Excel",
+                exportWordBtn: "ສົ່ງອອກ Word",
+                guideBtn: "ຄູ່ມືການນຳໃຊ້",
+                guideTitle: "ຄູ່ມືການນຳໃຊ້",
+                exportNoData: "ກະລຸນາອັບໂຫລດຂໍ້ມູນກ່ອນສົ່ງອອກ.",
+                reportTitle: "ກະດານສະແດງຜົນ FUAT — ບົດລາຍງານ",
+                reportGenerated: "ສ້າງເມື່ອ",
+                reportRespondents: "ຈຳນວນຜູ້ຕອບໃນການເລືອກປັດຈຸບັນ",
+                reportMetric: "ຕົວຊີ້ວັດ",
+                reportValue: "ຄ່າ",
+                reportTotalRespondents: "ຈຳນວນຜູ້ຕອບທັງໝົດ",
+                reportGenderSplit: "ຊາຍ / ຍິງ",
+                reportAppliedSkills: "ນຳໃຊ້ທັກສະ (ແມ່ນ)",
+                reportThemesHeading: "ຫົວຂໍ້ທີ່ພົບ",
+                reportNoThemes: "ບໍ່ພົບຫົວຂໍ້.",
+                reportQuotesHeading: "ຄຳຕອບຕົວແທນ",
+                reportNoQuotes: "ບໍ່ມີຄຳຕອບ.",
                 province: "ແຂວງ",
                 district: "ເມືອງ",
                 allProv: "ທຸກແຂວງ",
                 allDist: "ທຸກເມືອງ",
+                filterTraining: "ຫົວຂໍ້ຝຶກອົບຮົມ (207)",
+                filterTrainingOption: "ຫົວຂໍ້ຝຶກອົບຮົມ (Q207)",
+                filterTrainingOther: "ຝຶກອົບຮົມອື່ນໆ (207a)",
+                allTrainings: "ທຸກຫົວຂໍ້",
+                allTrainingOptions: "ທຸກຕົວເລືອກ",
+                allOther: "ທັງໝົດ",
+                filterFacilityType: "ປະເພດສະຖານທີ່ (205)",
+                allFacilityTypes: "ທຸກປະເພດ",
+                clearFilterLabel: "ລ້າງ",
+                selectedSuffix: " ອັນທີ່ເລືອກ",
                 genderDist: "ການແບ່ງເພດ",
                 appliedTitle: "ການນຳໃຊ້ທັກສະ",
                 male: "ຊາຍ",
@@ -426,7 +822,31 @@
                 ai3P1: "ການວິເຄາະໂດຍ Gemini: ກ່ຽວກັບຄວາມຕ້ອງການໃນອະນາຄົດ, ມີ ",
                 ai3P2: " ຄົນທີ່ໄດ້ລະບຸຄຳຮ້ອງຂໍການຊ່ວຍເຫຼືອຢ່າງຊັດເຈນ.",
                 ai3P3_1: "ຄວາມຕ້ອງການຫຼັກແມ່ນຖືກສະຫຼຸບໂດຍ ",
-                ai3P3_2: " ຕົວຢ່າງການຊ່ວຍເຫຼືອທີ່ຮ້ອງຂໍ ຂ້າງລຸ່ມນີ້."
+                ai3P3_2: " ຕົວຢ່າງການຊ່ວຍເຫຼືອທີ່ຮ້ອງຂໍ ຂ້າງລຸ່ມນີ້.",
+                errReadFail: "ບໍ່ສາມາດອ່ານໄຟລ໌ໄດ້. ກະລຸນາລອງໃໝ່ອີກຄັ້ງ.",
+                errNoSheet: "ໄຟລ໌ນີ້ບໍ່ມີຊີດຂໍ້ມູນທີ່ອ່ານໄດ້.",
+                errParseFail: "ບໍ່ສາມາດອ່ານໄຟລ໌ນີ້ໄດ້. ກະລຸນາກວດສອບວ່າເປັນໄຟລ໌ Excel ຫຼື CSV ທີ່ຖືກຕ້ອງ.",
+                errEmptyFile: "ໄຟລ໌ນີ້ບໍ່ມີຂໍ້ມູນ. ກະລຸນາອັບໂຫລດໄຟລ໌ທີ່ມີແຖວຂໍ້ມູນ.",
+                errMissingCols: "ແຈ້ງເຕືອນ: ບໍ່ພົບຄໍລໍາຕໍ່ໄປນີ້ໃນໄຟລ໌:",
+                aiGenerateBtn: "ໃຫ້ AI ວິເຄາະ Themes",
+                aiMissingKey: "ກະລຸນາໃສ່ Gemini API Key ຂ້າງເທິງ.",
+                aiNoData: "ບໍ່ມີຄຳຕອບແບບຂໍ້ຄວາມສຳລັບການເລືອກປັດຈຸບັນ.",
+                aiGenerating: "ກຳລັງວິເຄາະຄຳຕອບດ້ວຍ Gemini... ອາດໃຊ້ເວລາບຶ່ງໜ້ອຍໜຶ່ງ.",
+                aiSuccess: "ສ້າງ Themes ດ້ວຍ AI ສຳເລັດແລ້ວ.",
+                aiErrorKey: "API Key ບໍ່ຖືກຕ້ອງ ຫຼືບໍ່ໄດ້ຮັບອະນຸຍາດ. ກະລຸນາກວດສອບ Gemini API Key.",
+                aiErrorRateLimit: "Gemini API ຮອດຂີດຈຳກັດການນຳໃຊ້. ກະລຸນາລໍຖ້າແລ້ວລອງໃໝ່.",
+                aiErrorModel: "ບໍ່ພົບໂມເດວທີ່ລະບຸ. ກະລຸນາກວດສອບຊື່ Model.",
+                aiErrorParse: "ໄດ້ຮັບຄຳຕອບຈາກ Gemini ທີ່ບໍ່ຄາດຄິດ. ກະລຸນາລອງໃໝ່.",
+                aiErrorGeneric: "ມີຂໍ້ຜິດພາດໃນການຕິດຕໍ່ Gemini. ກະລຸນາລອງໃໝ່.",
+                aiThemeQuotesLabel: "ຕົວຢ່າງຄຳເຫັນທີ່ AI ລະບຸ",
+                localAutoBtn: "ຄົ້ນຫາ Themes ອັດຕະໂນມັດ (Local)",
+                localAutoRunning: "ກຳລັງສະແກນຫາຄຳ/ປະໂຫຍກທີ່ຊ້ຳກັນ (ບໍ່ໃຊ້ອິນເຕີເນັດ, ຂໍ້ມູນບໍ່ອອກຈາກ browser ຂອງທ່ານ)...",
+                localAutoSuccess: "ສ້າງ Themes ແບບ Local ສຳເລັດແລ້ວ.",
+                localAutoNoData: "ບໍ່ມີຄຳຕອບແບບຂໍ້ຄວາມສຳລັບການເລືອກປັດຈຸບັນ.",
+                localAutoSummary: "ການວິເຄາະແບບ Local (ບໍ່ໃຊ້ AI/ອິນເຕີເນັດ) ຈາກ ",
+                localAutoSummary2: " ຄຳຕອບ ພົບຄຳ/ປະໂຫຍກທີ່ຊ້ຳກັນຕໍ່ໄປນີ້:",
+                localAutoQuotesLabel: "ຕົວຢ່າງຄຳຕອບທີ່ມີຄຳ/ປະໂຫຍກເຫຼົ່ານີ້",
+                localOtherLabel: "ອື່ນໆ / ບໍ່ມີຄຳຊ້ຳ"
             }
         };
 
@@ -434,6 +854,9 @@
             currentLang = currentLang === 'en' ? 'lo' : 'en';
             updateUI();
             if (rawData.length > 0) applyFilters();
+            if (!document.getElementById('guide-modal').classList.contains('hidden')) {
+                document.getElementById('guide-content').innerHTML = currentLang === 'en' ? getGuideContentEn() : getGuideContentLo();
+            }
         }
 
         function updateUI() {
@@ -443,8 +866,18 @@
             document.getElementById('ui-subtitle').innerText = t.subtitle;
             document.getElementById('ui-upload-btn').innerText = t.upload;
             document.getElementById('ui-print-btn').innerText = t.printBtn;
+            document.getElementById('ui-export-excel-btn').innerText = t.exportExcelBtn;
+            document.getElementById('ui-export-word-btn').innerText = t.exportWordBtn;
+            document.getElementById('ui-guide-btn').innerText = t.guideBtn;
+            document.getElementById('ui-guide-title').innerText = t.guideTitle;
             document.getElementById('ui-filter-province').innerText = t.province;
             document.getElementById('ui-filter-district').innerText = t.district;
+            document.getElementById('ui-filter-training').innerText = t.filterTraining;
+            document.getElementById('ui-filter-training-option').innerText = t.filterTrainingOption;
+            document.getElementById('ui-filter-training-other').innerText = t.filterTrainingOther;
+            document.getElementById('ui-filter-facility-type').innerText = t.filterFacilityType;
+            document.getElementById('ui-ai-generate-btn').innerText = t.aiGenerateBtn;
+            document.getElementById('ui-local-auto-generate-btn').innerText = t.localAutoBtn;
             document.getElementById('ui-gender-title').innerText = t.genderDist;
             document.getElementById('ui-applied-title').innerText = t.appliedTitle;
             document.getElementById('ui-male-label').innerText = t.male;
@@ -466,34 +899,94 @@
             document.getElementById('ui-empty-desc').innerText = t.emptyDesc;
             document.getElementById('lang-label').innerText = t.langBtn;
 
-            const provSelect = document.getElementById('filter-province');
-            const distSelect = document.getElementById('filter-district');
-            provSelect.options[0].text = t.allProv;
-            distSelect.options[0].text = t.allDist;
+            Object.keys(MS_ALL_LABEL_KEYS).forEach(key => updateMsLabel(key, t[MS_ALL_LABEL_KEYS[key]]));
+        }
+
+        function showMessage(message, type) {
+            const el = document.getElementById('upload-message');
+            el.textContent = message;
+            el.className = `mb-6 p-4 rounded-xl border text-sm font-semibold no-print ${
+                type === 'warning'
+                    ? 'bg-amber-50 border-amber-200 text-amber-700'
+                    : 'bg-red-50 border-red-200 text-red-700'
+            }`;
+            el.classList.remove('hidden');
+        }
+
+        function hideMessage() {
+            document.getElementById('upload-message').classList.add('hidden');
         }
 
         async function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
+
+            hideMessage();
+
             // Strip the file extension for a cleaner title display
             uploadedFileName = file.name.replace(/\.[^/.]+$/, "");
             updateUI();
-            
+
             const reader = new FileReader();
+            reader.onerror = function() {
+                showMessage(i18n[currentLang].errReadFail, 'error');
+            };
             reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonArray = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-                processExcelData(jsonArray);
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheetName = workbook.SheetNames[0];
+                    if (!firstSheetName) {
+                        showMessage(i18n[currentLang].errNoSheet, 'error');
+                        return;
+                    }
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonArray = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                    processExcelData(jsonArray);
+                } catch (err) {
+                    console.error(err);
+                    showMessage(i18n[currentLang].errParseFail, 'error');
+                }
             };
             reader.readAsArrayBuffer(file);
         }
 
+        // Maps real column headers onto COL's canonical names when they don't match exactly -
+        // e.g. a header like "206. please tell us if you are female or male." resolves to COL.gender.
+        function normalizeColumnNames(rows) {
+            if (rows.length === 0) return rows;
+            const headers = Object.keys(rows[0]);
+            const aliasMap = {
+                [COL.gender]: ['female or male'],
+                [COL.appliedSkill]: ['which skills or knowledge you learned']
+            };
+
+            const resolved = {};
+            Object.values(COL).forEach(canonical => {
+                if (headers.includes(canonical)) return; // already an exact match, nothing to resolve
+                const candidates = [canonical, ...(aliasMap[canonical] || [])].sort((a, b) => b.length - a.length);
+                for (const alias of candidates) {
+                    const match = headers.find(h => h.includes(alias));
+                    if (match) { resolved[canonical] = match; break; }
+                }
+            });
+
+            if (Object.keys(resolved).length === 0) return rows;
+
+            return rows.map(row => {
+                const newRow = { ...row };
+                Object.entries(resolved).forEach(([canonical, actualHeader]) => {
+                    newRow[canonical] = row[actualHeader];
+                });
+                return newRow;
+            });
+        }
+
         function processExcelData(jsonArray) {
-            if (!jsonArray || jsonArray.length === 0) return;
+            if (!jsonArray || jsonArray.length === 0) {
+                showMessage(i18n[currentLang].errEmptyFile, 'error');
+                return;
+            }
 
             rawData = jsonArray.map(row => {
                 const normalizedRow = {};
@@ -503,41 +996,87 @@
                 }
                 return normalizedRow;
             });
-            
+            rawData = normalizeColumnNames(rawData);
+
+            const requiredCols = [COL.province, COL.district, COL.gender, COL.appliedSkill];
+            const availableCols = Object.keys(rawData[0] || {});
+            const missingCols = requiredCols.filter(c => !availableCols.includes(c));
+            if (missingCols.length > 0) {
+                showMessage(`${i18n[currentLang].errMissingCols} ${missingCols.join(', ')}`, 'warning');
+            }
+
             populateProvinces();
+            populateTrainingFilters();
             document.getElementById('empty-state').classList.add('hidden');
             document.getElementById('dashboard-content').classList.remove('hidden');
-            applyFilters();
+            updateDistricts();
+        }
+
+        function populateTrainingFilters() {
+            const t = i18n[currentLang];
+            filterState.training = [];
+            filterState.trainingOption = [];
+            filterState.trainingOther = [];
+            filterState.facilityType = [];
+            populateMsFilter('training', [...new Set(rawData.map(d => d[COL.trainingReceived]).filter(Boolean))].sort(), t.allTrainings);
+            populateMsFilter('trainingOption', [...new Set(rawData.map(d => d[COL.trainingOption]).filter(Boolean))].sort(), t.allTrainingOptions);
+            populateMsFilter('trainingOther', [...new Set(rawData.map(d => d[COL.trainingOtherSpecify]).filter(Boolean))].sort(), t.allOther);
+            populateMsFilter('facilityType', [...new Set(rawData.map(d => d[COL.facilityType]).filter(Boolean))].sort(), t.allFacilityTypes);
         }
 
         function populateProvinces() {
-            const ps = ["Phongsaly", "Oudomxay", "Vientiane Capital", "Savannakhet", "Salavan", "Sekong"];
-            const sel = document.getElementById('filter-province');
-            sel.innerHTML = `<option value="">${i18n[currentLang].allProv}</option>`;
-            ps.forEach(p => { const o = document.createElement('option'); o.value = p; o.innerText = p; sel.appendChild(o); });
+            filterState.province = [];
+            const ps = [...new Set(rawData.map(d => d[COL.province]).filter(Boolean))].sort();
+            populateMsFilter('province', ps, i18n[currentLang].allProv);
         }
 
         function updateDistricts() {
-            const p = document.getElementById('filter-province').value;
-            const sel = document.getElementById('filter-district');
-            
-            let ds = p ? [...new Set(rawData.filter(d => d['province']?.toLowerCase() === p.toLowerCase()).map(d => d['district']))] : [...new Set(rawData.map(d => d['district']))];
+            const selectedProvinces = filterState.province;
+            let ds = selectedProvinces.length
+                ? [...new Set(rawData.filter(d => selectedProvinces.some(p => d[COL.province]?.toLowerCase() === p.toLowerCase())).map(d => d[COL.district]))]
+                : [...new Set(rawData.map(d => d[COL.district]))];
             ds = ds.filter(Boolean).sort();
-            
-            sel.innerHTML = `<option value="">${i18n[currentLang].allDist}</option>`;
-            ds.forEach(d => { const o = document.createElement('option'); o.value = d; o.innerText = d; sel.appendChild(o); });
+
+            // Drop any previously-selected districts that no longer apply to the new province selection
+            filterState.district = filterState.district.filter(d => ds.includes(d));
+
+            populateMsFilter('district', ds, i18n[currentLang].allDist);
             applyFilters();
         }
 
-        function applyFilters() {
-            const p = document.getElementById('filter-province').value;
-            const d = document.getElementById('filter-district').value;
+        function getFilteredData() {
             let f = rawData;
-            
-            if (p) f = f.filter(x => x['province']?.toLowerCase() === p.toLowerCase());
-            if (d) f = f.filter(x => x['district'] === d);
-            
-            updateDashboard(f);
+
+            if (filterState.province.length) {
+                const provSet = new Set(filterState.province.map(p => p.toLowerCase()));
+                f = f.filter(x => provSet.has((x[COL.province] || '').toLowerCase()));
+            }
+            if (filterState.district.length) {
+                const distSet = new Set(filterState.district);
+                f = f.filter(x => distSet.has(x[COL.district]));
+            }
+            if (filterState.training.length) {
+                const set = new Set(filterState.training);
+                f = f.filter(x => set.has(x[COL.trainingReceived]));
+            }
+            if (filterState.trainingOption.length) {
+                const set = new Set(filterState.trainingOption);
+                f = f.filter(x => set.has(x[COL.trainingOption]));
+            }
+            if (filterState.trainingOther.length) {
+                const set = new Set(filterState.trainingOther);
+                f = f.filter(x => set.has(x[COL.trainingOtherSpecify]));
+            }
+            if (filterState.facilityType.length) {
+                const set = new Set(filterState.facilityType);
+                f = f.filter(x => set.has(x[COL.facilityType]));
+            }
+
+            return f;
+        }
+
+        function applyFilters() {
+            updateDashboard(getFilteredData());
         }
 
         function updateDashboard(data) {
@@ -545,7 +1084,7 @@
             const t = i18n[currentLang];
 
             // Gender
-            const male = data.filter(d => d['gender']?.toLowerCase() === 'male' || d['gender'] === 'ຊາຍ').length;
+            const male = data.filter(d => d[COL.gender]?.toLowerCase() === 'male' || d[COL.gender] === 'ຊາຍ').length;
             const female = total - male;
             const malePct = total > 0 ? Math.round((male/total)*100) : 0;
             const femalePct = total > 0 ? (100 - malePct) : 0;
@@ -556,7 +1095,7 @@
 
             // Applied Knowledge
             const appliedYes = data.filter(d => {
-                const val = (d['skill knowledge using'] || '').trim().toLowerCase();
+                const val = (d[COL.appliedSkill] || '').trim().toLowerCase();
                 return ['yes', 'ແມ່ນ', 'y'].includes(val);
             }).length;
             const appliedNo = total - appliedYes;
@@ -567,31 +1106,17 @@
             document.getElementById('not-applied-pct').innerText = `${appliedNo} (${notAppliedPct}%)`;
             document.getElementById('chart-applied').style.background = `conic-gradient(#10b981 0% ${appliedPct}%, #e2e8f0 ${appliedPct}% 100%)`;
 
-            // Common Theme Visual Styles
-            const styleSets = [
-                { bg: 'bg-purple-50', border: 'border-purple-100', text: 'text-purple-800', badgeBg: 'bg-purple-200', kwText: 'text-purple-500' },
-                { bg: 'bg-blue-50', border: 'border-blue-100', text: 'text-blue-800', badgeBg: 'bg-blue-200', kwText: 'text-blue-500' },
-                { bg: 'bg-emerald-50', border: 'border-emerald-100', text: 'text-emerald-800', badgeBg: 'bg-emerald-200', kwText: 'text-emerald-500' },
-                { bg: 'bg-amber-50', border: 'border-amber-100', text: 'text-amber-800', badgeBg: 'bg-amber-200', kwText: 'text-amber-500' },
-                { bg: 'bg-rose-50', border: 'border-rose-100', text: 'text-rose-800', badgeBg: 'bg-rose-200', kwText: 'text-rose-500' },
-                { bg: 'bg-slate-50', border: 'border-slate-200', text: 'text-slate-700', badgeBg: 'bg-slate-200', kwText: 'text-slate-500' },
-                { bg: 'bg-cyan-50', border: 'border-cyan-100', text: 'text-cyan-800', badgeBg: 'bg-cyan-200', kwText: 'text-cyan-500' },
-                { bg: 'bg-orange-50', border: 'border-orange-100', text: 'text-orange-800', badgeBg: 'bg-orange-200', kwText: 'text-orange-500' },
-                { bg: 'bg-teal-50', border: 'border-teal-100', text: 'text-teal-800', badgeBg: 'bg-teal-200', kwText: 'text-teal-500' }
-            ];
-
             // -------------------------------------------------------------
             // SECTION 1: APPLIED SKILLS
             // -------------------------------------------------------------
-            const colEx = "example of how you have applied that skill or knowledge in your work?".toLowerCase();
-            const validTexts = data.map(d => d[colEx]).filter(q => q && q.length > 15);
+            const validTexts = data.map(d => d[COL.exampleApplied]).filter(q => q && q.length > 15);
             const richCount = validTexts.length;
             document.getElementById('qual-total').innerText = total;
             document.getElementById('qual-rich').innerText = richCount;
 
             const quotesContainer = document.getElementById('quotes-container');
             quotesContainer.innerHTML = '';
-            const quotes = [...new Set(data.map(d => d[colEx]).filter(q => q && q.length > 20))].slice(0, 5);
+            const quotes = [...new Set(data.map(d => d[COL.exampleApplied]).filter(q => q && q.length > 20))].slice(0, 5);
 
             // --- 10 SPECIFIC THEMES FOR SECTION 1 ---
             const sec1Themes = [
@@ -607,72 +1132,16 @@
                 { id: 's1t10', en: 'Others', lo: 'ອື່ນໆ', kws: ['ການນຳໃຊ້ໃນຊີວິດປະຈຳວັນ', 'ທົ່ວໄປ', 'ອື່ນໆ', 'other', 'daily life'] }
             ];
 
-            let counts1 = {};
-            sec1Themes.forEach(t => counts1[t.id] = 0);
-
-            validTexts.forEach(text => {
-                const lower = text.toLowerCase();
-                let bestTheme = 's1t10'; 
-                let maxMatches = 0;
-                sec1Themes.forEach(theme => {
-                    if (theme.id === 's1t10') return;
-                    let matches = theme.kws.filter(kw => lower.includes(kw.toLowerCase())).length;
-                    if (matches > maxMatches) { maxMatches = matches; bestTheme = theme.id; }
-                });
-                if (maxMatches === 0) {
-                    let otherMatches = sec1Themes.find(th => th.id === 's1t10').kws.filter(kw => lower.includes(kw.toLowerCase())).length;
-                    if (otherMatches > 0) bestTheme = 's1t10';
-                }
-                counts1[bestTheme]++;
+            const counts1 = computeThemeCounts(validTexts, sec1Themes);
+            const themeHtml1 = renderThemeCards(sec1Themes, counts1, 0, t.keywordsLabel);
+            const bestSentences1 = pickBestSentences(validTexts, sec1Themes);
+            const fullSentenceHtml1 = renderFullSentenceBox(bestSentences1, t.repSentenceLabel, {
+                borderColor: 'border-purple-200/50',
+                gradient: 'from-purple-50 to-indigo-50',
+                boxBorder: 'border-purple-100',
+                accentText: 'text-purple-500',
+                icon: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
             });
-
-            let themeHtml1 = `<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">`;
-            
-            // Sort themes by count (descending), keeping 'Others' at the end
-            let sortedThemes1 = sec1Themes.filter(t => t.id !== 's1t10').sort((a, b) => counts1[b.id] - counts1[a.id]);
-            sortedThemes1.push(sec1Themes.find(t => t.id === 's1t10'));
-
-            sortedThemes1.forEach((theme, index) => {
-                const count = counts1[theme.id];
-                if (count === 0) return; // Hide theme if count is zero
-                
-                const style = styleSets[index % styleSets.length]; 
-                const title = currentLang === 'en' ? theme.en : theme.lo;
-                const kwText = currentLang === 'en' 
-                    ? theme.kws.filter(k => /^[a-zA-Z\s]+$/.test(k)).join(', ') || theme.kws.join(', ') 
-                    : theme.kws.filter(k => !/^[a-zA-Z\s]+$/.test(k)).join(', ') || theme.kws.join(', '); 
-                
-                themeHtml1 += `
-                    <div class="p-3 ${style.bg} rounded-xl border ${style.border} shadow-sm flex flex-col justify-between">
-                        <div class="flex justify-between items-start mb-2 gap-2">
-                            <span class="font-bold ${style.text} text-xs leading-snug">${title}</span>
-                            <span class="${style.badgeBg} ${style.text} py-0.5 px-2.5 rounded-full text-[10px] font-black shrink-0">${count}</span>
-                        </div>
-                        <p class="text-[9px] ${style.kwText} uppercase tracking-wider font-bold mt-1 leading-tight line-clamp-2" title="${kwText}">${t.keywordsLabel} ${kwText}</p>
-                    </div>
-                `;
-            });
-            themeHtml1 += `</div>`;
-
-            const combinedKeywords1 = sec1Themes.map(t => t.kws).flat();
-            let scoredSentences1 = validTexts.map(text => {
-                const lowerText = text.toLowerCase();
-                let score = 0;
-                combinedKeywords1.forEach(kw => { if (lowerText.includes(kw.toLowerCase())) score++; });
-                return { text, score };
-            }).filter(item => item.text.length > 30 && item.text.length < 500);
-
-            scoredSentences1.sort((a, b) => b.score - a.score || b.text.length - a.text.length);
-            let bestSentences1 = [...new Set(scoredSentences1.map(item => item.text))].slice(0, 3);
-            if (bestSentences1.length === 0 && validTexts.length > 0) {
-                bestSentences1 = [...new Set(validTexts)].sort((a, b) => b.length - a.length).slice(0, 3);
-            }
-
-            const sentencesListHtml1 = bestSentences1.map(s => `<p class="text-slate-800 italic font-medium leading-relaxed mb-4 pb-4 border-b border-purple-200/50 last:mb-0 last:pb-0 last:border-0">"${s}"</p>`).join('');
-
-            const fullSentenceHtml1 = bestSentences1.length > 0 
-                ? `<div class="mt-4 p-5 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-100 shadow-inner"><p class="text-[10px] font-bold text-purple-500 uppercase tracking-widest mb-3 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${t.repSentenceLabel} (Top ${bestSentences1.length})</p>${sentencesListHtml1}</div>`
-                : '';
 
             document.getElementById('ai-summary').innerHTML = `
                 <p>${t.aiP1} <b>${total}</b> ${t.aiP2} <b>${total > 0 ? Math.round((richCount/total)*100) : 0}%</b> ${t.aiP3}</p>
@@ -681,32 +1150,19 @@
                 <p class="leading-relaxed mb-2">${t.aiP6_3}</p>
                 ${fullSentenceHtml1}
             `;
-            
-            if (quotes.length === 0) {
-                quotesContainer.innerHTML = `<p class="text-slate-400 text-center py-10">${t.noQuotes}</p>`;
-            } else {
-                quotes.forEach(q => {
-                    const div = document.createElement('div');
-                    div.className = 'bg-white p-4 rounded-2xl border border-slate-100 shadow-sm';
-                    div.innerHTML = `
-                        <p class="text-slate-600 text-sm leading-relaxed">"${q}"</p>
-                        <div class="mt-2 text-[10px] font-bold text-slate-300 uppercase tracking-tighter">Verified Implementation</div>
-                    `;
-                    quotesContainer.appendChild(div);
-                });
-            }
+
+            renderQuoteCards(quotesContainer, quotes, t.noQuotes, 'Verified Implementation');
 
 
             // -------------------------------------------------------------
             // SECTION 2: BARRIERS TO IMPLEMENTATION
             // -------------------------------------------------------------
-            const colWhy = "Why do you think you were not able to apply those skills or knowledge in your work or at your organization?".toLowerCase();
-            const validTexts2 = data.map(d => d[colWhy]).filter(q => q && q.length > 15);
+            const validTexts2 = data.map(d => d[COL.whyNotApplied]).filter(q => q && q.length > 15);
             const richWhyCount = validTexts2.length;
             
             const quotesContainer2 = document.getElementById('quotes-container-2');
             quotesContainer2.innerHTML = '';
-            const quotes2 = [...new Set(data.map(d => d[colWhy]).filter(q => q && q.length > 20))].slice(0, 5);
+            const quotes2 = [...new Set(data.map(d => d[COL.whyNotApplied]).filter(q => q && q.length > 20))].slice(0, 5);
 
             // --- 6 SPECIFIC THEMES FOR SECTION 2 ---
             const sec2Themes = [
@@ -718,72 +1174,16 @@
                 { id: 's2t6', en: 'Others', lo: 'ອື່ນໆ', kws: ['ອື່ນໆ', 'ທົ່ວໄປ', 'ບໍ່ມີ', 'other', 'none'] }
             ];
 
-            let counts2 = {};
-            sec2Themes.forEach(t => counts2[t.id] = 0);
-
-            validTexts2.forEach(text => {
-                const lower = text.toLowerCase();
-                let bestTheme = 's2t6'; 
-                let maxMatches = 0;
-                sec2Themes.forEach(theme => {
-                    if (theme.id === 's2t6') return;
-                    let matches = theme.kws.filter(kw => lower.includes(kw.toLowerCase())).length;
-                    if (matches > maxMatches) { maxMatches = matches; bestTheme = theme.id; }
-                });
-                if (maxMatches === 0) {
-                    let otherMatches = sec2Themes.find(th => th.id === 's2t6').kws.filter(kw => lower.includes(kw.toLowerCase())).length;
-                    if (otherMatches > 0) bestTheme = 's2t6';
-                }
-                counts2[bestTheme]++;
+            const counts2 = computeThemeCounts(validTexts2, sec2Themes);
+            const themeHtml2 = renderThemeCards(sec2Themes, counts2, 4, t.keywordsLabel, 6);
+            const bestSentences2 = pickBestSentences(validTexts2, sec2Themes);
+            const fullSentenceHtml2 = renderFullSentenceBox(bestSentences2, t.repSentenceLabel, {
+                borderColor: 'border-rose-200/50',
+                gradient: 'from-rose-50 to-red-50',
+                boxBorder: 'border-rose-100',
+                accentText: 'text-rose-500',
+                icon: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
             });
-
-            let themeHtml2 = `<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">`;
-            
-            // Sort themes by count (descending), keeping 'Others' at the end
-            let sortedThemes2 = sec2Themes.filter(t => t.id !== 's2t6').sort((a, b) => counts2[b.id] - counts2[a.id]);
-            sortedThemes2.push(sec2Themes.find(t => t.id === 's2t6'));
-
-            sortedThemes2.forEach((theme, index) => {
-                const count = counts2[theme.id];
-                if (count === 0) return; // Hide theme if count is zero
-                
-                const style = styleSets[(index + 4) % 6]; // Rose-centric offset
-                const title = currentLang === 'en' ? theme.en : theme.lo;
-                const kwText = currentLang === 'en' 
-                    ? theme.kws.filter(k => /^[a-zA-Z\s]+$/.test(k)).join(', ') || theme.kws.join(', ')
-                    : theme.kws.filter(k => !/^[a-zA-Z\s]+$/.test(k)).join(', ') || theme.kws.join(', ');
-                
-                themeHtml2 += `
-                    <div class="p-3 ${style.bg} rounded-xl border ${style.border} shadow-sm flex flex-col justify-between">
-                        <div class="flex justify-between items-start mb-2 gap-2">
-                            <span class="font-bold ${style.text} text-xs leading-snug">${title}</span>
-                            <span class="${style.badgeBg} ${style.text} py-0.5 px-2.5 rounded-full text-[10px] font-black shrink-0">${count}</span>
-                        </div>
-                        <p class="text-[9px] ${style.kwText} uppercase tracking-wider font-bold mt-1 leading-tight line-clamp-2" title="${kwText}">${t.keywordsLabel} ${kwText}</p>
-                    </div>
-                `;
-            });
-            themeHtml2 += `</div>`;
-
-            const combinedKeywords2 = sec2Themes.map(t => t.kws).flat();
-            let scoredSentences2 = validTexts2.map(text => {
-                const lowerText = text.toLowerCase();
-                let score = 0;
-                combinedKeywords2.forEach(kw => { if (lowerText.includes(kw.toLowerCase())) score++; });
-                return { text, score };
-            }).filter(item => item.text.length > 30 && item.text.length < 500);
-
-            scoredSentences2.sort((a, b) => b.score - a.score || b.text.length - a.text.length);
-            let bestSentences2 = [...new Set(scoredSentences2.map(item => item.text))].slice(0, 3);
-            if (bestSentences2.length === 0 && validTexts2.length > 0) {
-                bestSentences2 = [...new Set(validTexts2)].sort((a, b) => b.length - a.length).slice(0, 3);
-            }
-
-            const sentencesListHtml2 = bestSentences2.map(s => `<p class="text-slate-800 italic font-medium leading-relaxed mb-4 pb-4 border-b border-rose-200/50 last:mb-0 last:pb-0 last:border-0">"${s}"</p>`).join('');
-
-            const fullSentenceHtml2 = bestSentences2.length > 0 
-                ? `<div class="mt-4 p-5 bg-gradient-to-r from-rose-50 to-red-50 rounded-xl border border-rose-100 shadow-inner"><p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest mb-3 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${t.repSentenceLabel} (Top ${bestSentences2.length})</p>${sentencesListHtml2}</div>`
-                : '';
 
             document.getElementById('ai-summary-2').innerHTML = `
                 <p class="leading-relaxed">${t.ai2P1} <b>${richWhyCount}</b> ${t.ai2P2}</p>
@@ -793,31 +1193,18 @@
                 ${fullSentenceHtml2}
             `;
 
-            if (quotes2.length === 0) {
-                quotesContainer2.innerHTML = `<p class="text-slate-400 text-center py-10">${t.noQuotes}</p>`;
-            } else {
-                quotes2.forEach(q => {
-                    const div = document.createElement('div');
-                    div.className = 'bg-white p-4 rounded-2xl border border-slate-100 shadow-sm';
-                    div.innerHTML = `
-                        <p class="text-slate-600 text-sm leading-relaxed">"${q}"</p>
-                        <div class="mt-2 text-[10px] font-bold text-slate-300 uppercase tracking-tighter">Reported Challenge</div>
-                    `;
-                    quotesContainer2.appendChild(div);
-                });
-            }
+            renderQuoteCards(quotesContainer2, quotes2, t.noQuotes, 'Reported Challenge');
 
 
             // -------------------------------------------------------------
             // SECTION 3: REQUIRED SUPPORT
             // -------------------------------------------------------------
-            const colSupport = "What kind of support would you need to apply those skills or knowledge in your work?".toLowerCase();
-            const validTexts3 = data.map(d => d[colSupport]).filter(q => q && q.length > 15);
+            const validTexts3 = data.map(d => d[COL.supportNeeded]).filter(q => q && q.length > 15);
             const richSupportCount = validTexts3.length;
             
             const quotesContainer3 = document.getElementById('quotes-container-3');
             quotesContainer3.innerHTML = '';
-            const quotes3 = [...new Set(data.map(d => d[colSupport]).filter(q => q && q.length > 20))].slice(0, 5);
+            const quotes3 = [...new Set(data.map(d => d[COL.supportNeeded]).filter(q => q && q.length > 20))].slice(0, 5);
             
             // --- 6 SPECIFIC THEMES FOR SECTION 3 ---
             const sec3Themes = [
@@ -829,72 +1216,16 @@
                 { id: 's3t6', en: 'Others', lo: 'ອື່ນໆ', kws: ['ທົ່ວໄປ', 'ອື່ນໆ', 'other', 'general'] }
             ];
 
-            let counts3 = {};
-            sec3Themes.forEach(t => counts3[t.id] = 0);
-
-            validTexts3.forEach(text => {
-                const lower = text.toLowerCase();
-                let bestTheme = 's3t6'; 
-                let maxMatches = 0;
-                sec3Themes.forEach(theme => {
-                    if (theme.id === 's3t6') return;
-                    let matches = theme.kws.filter(kw => lower.includes(kw.toLowerCase())).length;
-                    if (matches > maxMatches) { maxMatches = matches; bestTheme = theme.id; }
-                });
-                if (maxMatches === 0) {
-                    let otherMatches = sec3Themes.find(th => th.id === 's3t6').kws.filter(kw => lower.includes(kw.toLowerCase())).length;
-                    if (otherMatches > 0) bestTheme = 's3t6';
-                }
-                counts3[bestTheme]++;
+            const counts3 = computeThemeCounts(validTexts3, sec3Themes);
+            const themeHtml3 = renderThemeCards(sec3Themes, counts3, 8, t.keywordsLabel, 6);
+            const bestSentences3 = pickBestSentences(validTexts3, sec3Themes);
+            const fullSentenceHtml3 = renderFullSentenceBox(bestSentences3, t.repSentenceLabel, {
+                borderColor: 'border-teal-200/50',
+                gradient: 'from-teal-50 to-emerald-50',
+                boxBorder: 'border-teal-100',
+                accentText: 'text-teal-500',
+                icon: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
             });
-
-            let themeHtml3 = `<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">`;
-            
-            // Sort themes by count (descending), keeping 'Others' at the end
-            let sortedThemes3 = sec3Themes.filter(t => t.id !== 's3t6').sort((a, b) => counts3[b.id] - counts3[a.id]);
-            sortedThemes3.push(sec3Themes.find(t => t.id === 's3t6'));
-
-            sortedThemes3.forEach((theme, index) => {
-                const count = counts3[theme.id];
-                if (count === 0) return; // Hide theme if count is zero
-                
-                const style = styleSets[(index + 8) % 6]; // Teal/Emerald centric offset
-                const title = currentLang === 'en' ? theme.en : theme.lo;
-                const kwText = currentLang === 'en' 
-                    ? theme.kws.filter(k => /^[a-zA-Z\s\-]+$/.test(k)).join(', ') || theme.kws.join(', ')
-                    : theme.kws.filter(k => !/^[a-zA-Z\s\-]+$/.test(k)).join(', ') || theme.kws.join(', ');
-                
-                themeHtml3 += `
-                    <div class="p-3 ${style.bg} rounded-xl border ${style.border} shadow-sm flex flex-col justify-between">
-                        <div class="flex justify-between items-start mb-2 gap-2">
-                            <span class="font-bold ${style.text} text-xs leading-snug">${title}</span>
-                            <span class="${style.badgeBg} ${style.text} py-0.5 px-2.5 rounded-full text-[10px] font-black shrink-0">${count}</span>
-                        </div>
-                        <p class="text-[9px] ${style.kwText} uppercase tracking-wider font-bold mt-1 leading-tight line-clamp-2" title="${kwText}">${t.keywordsLabel} ${kwText}</p>
-                    </div>
-                `;
-            });
-            themeHtml3 += `</div>`;
-
-            const combinedKeywords3 = sec3Themes.map(t => t.kws).flat();
-            let scoredSentences3 = validTexts3.map(text => {
-                const lowerText = text.toLowerCase();
-                let score = 0;
-                combinedKeywords3.forEach(kw => { if (lowerText.includes(kw.toLowerCase())) score++; });
-                return { text, score };
-            }).filter(item => item.text.length > 30 && item.text.length < 500);
-
-            scoredSentences3.sort((a, b) => b.score - a.score || b.text.length - a.text.length);
-            let bestSentences3 = [...new Set(scoredSentences3.map(item => item.text))].slice(0, 3);
-            if (bestSentences3.length === 0 && validTexts3.length > 0) {
-                bestSentences3 = [...new Set(validTexts3)].sort((a, b) => b.length - a.length).slice(0, 3);
-            }
-
-            const sentencesListHtml3 = bestSentences3.map(s => `<p class="text-slate-800 italic font-medium leading-relaxed mb-4 pb-4 border-b border-teal-200/50 last:mb-0 last:pb-0 last:border-0">"${s}"</p>`).join('');
-
-            const fullSentenceHtml3 = bestSentences3.length > 0 
-                ? `<div class="mt-4 p-5 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl border border-teal-100 shadow-inner"><p class="text-[10px] font-bold text-teal-500 uppercase tracking-widest mb-3 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>${t.repSentenceLabel} (Top ${bestSentences3.length})</p>${sentencesListHtml3}</div>`
-                : '';
 
             document.getElementById('ai-summary-3').innerHTML = `
                 <p class="leading-relaxed">${t.ai3P1} <b>${richSupportCount}</b> ${t.ai3P2}</p>
@@ -904,22 +1235,639 @@
                 ${fullSentenceHtml3}
             `;
 
-            if (quotes3.length === 0) {
-                quotesContainer3.innerHTML = `<p class="text-slate-400 text-center py-10">${t.noQuotes}</p>`;
-            } else {
-                quotes3.forEach(q => {
-                    const div = document.createElement('div');
-                    div.className = 'bg-white p-4 rounded-2xl border border-slate-100 shadow-sm';
-                    div.innerHTML = `
-                        <p class="text-slate-600 text-sm leading-relaxed">"${q}"</p>
-                        <div class="mt-2 text-[10px] font-bold text-slate-300 uppercase tracking-tighter">Support Request</div>
-                    `;
-                    quotesContainer3.appendChild(div);
+            renderQuoteCards(quotesContainer3, quotes3, t.noQuotes, 'Support Request');
+        }
+
+        // -------------------------------------------------------------
+        // LOCAL AUTO-DISCOVER THEMES (no AI/internet - runs entirely offline)
+        // Finds recurring words/phrases across responses via simple document-
+        // frequency scoring, then feeds them into the same theme-card renderer
+        // used by the hardcoded local-keyword themes and the AI themes.
+        // -------------------------------------------------------------
+
+        const LATIN_STOPWORDS = new Set([
+            'the', 'and', 'or', 'to', 'a', 'an', 'in', 'on', 'at', 'of', 'for', 'with', 'is', 'was', 'were', 'are', 'be', 'been',
+            'it', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'they', 'we', 'my', 'your', 'his', 'her', 'their',
+            'our', 'as', 'by', 'from', 'have', 'has', 'had', 'do', 'does', 'did', 'not', 'no', 'so', 'if', 'but', 'can', 'could',
+            'would', 'should', 'will', 'shall', 'than', 'then', 'there', 'here', 'also', 'very', 'more', 'most', 'some', 'any',
+            'all', 'both', 'each', 'other', 'such', 'only', 'own', 'same', 'because', 'about', 'into', 'through', 'during',
+            'before', 'after', 'above', 'below', 'up', 'down', 'out', 'off', 'over', 'under', 'again', 'further', 'once', 'etc'
+        ]);
+
+        const LAO_NOISE_SUBSTRINGS = [
+            // Generic function words (no thematic signal)
+            'ແມ່ນ', 'ຂອງຕົນ', 'ຂອງ', 'ໃນການ', 'ໃນ', 'ແລະ', 'ກັບ', 'ທີ່', 'ໄດ້', 'ຈະ', 'ມີ', 'ບໍ່', 'ເປັນ', 'ໃຫ້', 'ຄື', 'ນີ້', 'ນັ້ນ', 'ຫຼາຍ',
+            'ຈາກ', 'ໄປ', 'ມາ', 'ຢູ່', 'ເພື່ອ', 'ກໍ່', 'ຍັງ', 'ແຕ່', 'ຫຼື', 'ວ່າ', 'ຕໍ່ໄປ', 'ຕໍ່', 'ໜ້ອຍ', 'ຫຼັງ', 'ກ່ອນ', 'ຄວາມ', 'ໃໝ່',
+            'ຕົນເອງ', 'ອາດ', 'ຈຶ່ງ', 'ພວກ', 'ຊຶ່ງ', 'ເຊິ່ງ',
+            // Survey-wide vocabulary that appears in nearly every answer regardless of theme
+            'ຝຶກອົບຮົມ', 'ອົບຮົມ', 'ສຸກສາລາ', 'ຂໍ້ມູນ', 'ຄວາມຮູ້', 'ທັກສະ', 'ວຽກງານ', 'ໃນວຽກ', 'ວຽກ', 'ການເຮັດວຽກ'
+        ];
+
+        function extractCandidatePhrases(text) {
+            const phrases = new Set();
+
+            const latinWords = text.toLowerCase().match(/[a-z]{4,}/g) || [];
+            latinWords.forEach(w => { if (!LATIN_STOPWORDS.has(w)) phrases.add(w); });
+
+            let laoText = text;
+            LAO_NOISE_SUBSTRINGS.forEach(sw => { laoText = laoText.split(sw).join(' '); });
+            const laoRuns = (laoText.match(/[຀-໿]+/g) || []).filter(run => run.length >= 6);
+            laoRuns.forEach(run => {
+                // A single, longer window per run (not multiple overlapping lengths) keeps
+                // candidates closer to whole words/short phrases and limits nested-substring noise
+                const len = Math.min(8, run.length);
+                for (let i = 0; i + len <= run.length; i += len) {
+                    phrases.add(run.slice(i, i + len));
+                }
+            });
+
+            return phrases;
+        }
+
+        function jaccardSimilarity(setA, setB) {
+            let intersection = 0;
+            setA.forEach(x => { if (setB.has(x)) intersection++; });
+            const union = setA.size + setB.size - intersection;
+            return union === 0 ? 0 : intersection / union;
+        }
+
+        function discoverThemesFromTexts(texts, maxThemes) {
+            const df = new Map(); // phrase -> Set of text indices containing it
+            texts.forEach((text, idx) => {
+                extractCandidatePhrases(text).forEach(p => {
+                    if (!df.has(p)) df.set(p, new Set());
+                    df.get(p).add(idx);
                 });
+            });
+
+            const minDf = Math.max(2, Math.ceil(texts.length * 0.03));
+            const maxDf = Math.floor(texts.length * 0.6);
+
+            const candidates = [...df.entries()]
+                .filter(([, docs]) => docs.size >= minDf && docs.size <= maxDf)
+                .map(([phrase, docs]) => ({ phrase, df: docs.size, docs }))
+                .sort((a, b) => b.df - a.df || b.phrase.length - a.phrase.length);
+
+            const selected = [];
+            for (const cand of candidates) {
+                if (selected.length >= maxThemes) break;
+                const isRedundant = selected.some(sel =>
+                    (sel.phrase.includes(cand.phrase) || cand.phrase.includes(sel.phrase)) &&
+                    jaccardSimilarity(sel.docs, cand.docs) > 0.6
+                );
+                if (!isRedundant) selected.push(cand);
+            }
+            return selected;
+        }
+
+        function buildAutoThemes(discovered, otherLabel) {
+            const themes = discovered.map((d, i) => ({ id: `auto${i}`, en: d.phrase, lo: d.phrase, kws: [d.phrase] }));
+            themes.push({ id: 'auto-other', en: otherLabel, lo: otherLabel, kws: [] });
+            return themes;
+        }
+
+        function renderLocalAutoSection(containerId, quotesContainerId, texts, styleOffset, opts) {
+            const t = i18n[currentLang];
+            const discovered = discoverThemesFromTexts(texts, 8);
+            const themes = buildAutoThemes(discovered, t.localOtherLabel);
+            const counts = computeThemeCounts(texts, themes);
+            const themeHtml = renderThemeCards(themes, counts, styleOffset, t.keywordsLabel, opts.modBase);
+            const bestSentences = pickBestSentences(texts, themes);
+            const fullSentenceHtml = renderFullSentenceBox(bestSentences, t.localAutoQuotesLabel, opts);
+
+            document.getElementById(containerId).innerHTML = `
+                <p class="leading-relaxed">${t.localAutoSummary}<b>${texts.length}</b>${t.localAutoSummary2}</p>
+                ${themeHtml}
+                ${fullSentenceHtml}
+            `;
+        }
+
+        async function generateAllLocalAutoThemes() {
+            const t = i18n[currentLang];
+            const btn = document.getElementById('local-auto-generate-btn');
+            const status = document.getElementById('local-auto-status');
+
+            btn.disabled = true;
+            status.textContent = t.localAutoRunning;
+            status.className = 'text-xs text-slate-500 mt-1 animate-pulse';
+
+            // Yield a frame so the "running" status paints before the (synchronous) scan runs
+            await new Promise(r => setTimeout(r, 30));
+
+            try {
+                const data = getFilteredData();
+                const texts1 = data.map(x => x[COL.exampleApplied]).filter(q => q && q.length > 15);
+                const texts2 = data.map(x => x[COL.whyNotApplied]).filter(q => q && q.length > 15);
+                const texts3 = data.map(x => x[COL.supportNeeded]).filter(q => q && q.length > 15);
+
+                if (texts1.length === 0 && texts2.length === 0 && texts3.length === 0) {
+                    throw new Error('NO_DATA');
+                }
+
+                const searchIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+
+                renderLocalAutoSection('ai-summary', 'quotes-container', texts1, 0, {
+                    borderColor: 'border-purple-200/50', gradient: 'from-purple-50 to-indigo-50',
+                    boxBorder: 'border-purple-100', accentText: 'text-purple-500', icon: searchIcon
+                });
+                renderLocalAutoSection('ai-summary-2', 'quotes-container-2', texts2, 4, {
+                    modBase: 6, borderColor: 'border-rose-200/50', gradient: 'from-rose-50 to-red-50',
+                    boxBorder: 'border-rose-100', accentText: 'text-rose-500', icon: searchIcon
+                });
+                renderLocalAutoSection('ai-summary-3', 'quotes-container-3', texts3, 8, {
+                    modBase: 6, borderColor: 'border-teal-200/50', gradient: 'from-teal-50 to-emerald-50',
+                    boxBorder: 'border-teal-100', accentText: 'text-teal-500', icon: searchIcon
+                });
+
+                status.textContent = t.localAutoSuccess;
+                status.className = 'text-xs text-emerald-600 mt-1';
+            } catch (err) {
+                console.error(err);
+                status.textContent = err.message === 'NO_DATA' ? t.localAutoNoData : t.aiErrorGeneric;
+                status.className = 'text-xs text-red-500 mt-1';
+            } finally {
+                btn.disabled = false;
             }
         }
 
-        window.onload = updateUI;
+        // -------------------------------------------------------------
+        // AI (Gemini) THEME GENERATION
+        // -------------------------------------------------------------
+
+        function escapeHtml(str) {
+            return String(str ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        }
+
+        function loadGeminiSettings() {
+            document.getElementById('gemini-api-key').value = localStorage.getItem('fuat_gemini_api_key') || '';
+            document.getElementById('gemini-model').value = localStorage.getItem('fuat_gemini_model') || 'gemini-2.0-flash';
+        }
+
+        function saveGeminiSettings() {
+            localStorage.setItem('fuat_gemini_api_key', document.getElementById('gemini-api-key').value.trim());
+            localStorage.setItem('fuat_gemini_model', document.getElementById('gemini-model').value.trim());
+        }
+
+        async function callGeminiForThemes(texts, questionContext) {
+            const apiKey = document.getElementById('gemini-api-key').value.trim();
+            const model = document.getElementById('gemini-model').value.trim() || 'gemini-2.0-flash';
+            if (!apiKey) throw new Error('MISSING_KEY');
+            if (texts.length === 0) throw new Error('NO_DATA');
+
+            // Guard against oversized payloads while keeping as many responses as fit
+            const MAX_CHARS = 120000;
+            let combinedLength = 0;
+            const included = [];
+            for (const text of texts) {
+                if (combinedLength + text.length > MAX_CHARS) break;
+                combinedLength += text.length;
+                included.push(text);
+            }
+
+            const prompt = `You are analyzing open-ended survey responses in Lao and/or English from a health-worker training follow-up survey.
+Question context: ${questionContext}
+
+Below are ${included.length} respondent answers, one per line:
+---
+${included.map((text, i) => `${i + 1}. ${text}`).join('\n')}
+---
+
+Identify 4 to 8 distinct recurring themes across these answers. For each theme, provide:
+- name_en: short theme name in English (3-6 words)
+- name_lo: the same theme name translated into Lao
+- count: how many of the answers above belong primarily to this theme
+- keywords: 3-6 representative keywords or short phrases drawn from the actual answers (mix of Lao and English as they appear)
+- example_quote: one verbatim quote from the answers above that best represents this theme (copy exactly, do not translate or paraphrase)
+
+Also provide a 2-3 sentence narrative summary of the overall patterns: summary_en in English, and summary_lo as its Lao translation.
+
+Respond with JSON only, matching this schema:
+{"summary_en": string, "summary_lo": string, "themes": [{"name_en": string, "name_lo": string, "count": number, "keywords": string[], "example_quote": string}]}`;
+
+            const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { responseMimeType: 'application/json', temperature: 0.2 }
+                })
+            });
+
+            if (!resp.ok) {
+                const errBody = await resp.text().catch(() => '');
+                throw new Error(`API_ERROR:${resp.status}:${errBody.slice(0, 200)}`);
+            }
+
+            const json = await resp.json();
+            const textOut = json?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!textOut) throw new Error('EMPTY_RESPONSE');
+
+            try {
+                return JSON.parse(textOut);
+            } catch (e) {
+                throw new Error('PARSE_ERROR');
+            }
+        }
+
+        function renderAiThemeCards(themes, styleOffset, keywordsLabel, modBase) {
+            const base = modBase || styleSets.length;
+            let html = `<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">`;
+            themes.forEach((theme, index) => {
+                const style = styleSets[(index + styleOffset) % base];
+                const title = escapeHtml(currentLang === 'en' ? theme.name_en : (theme.name_lo || theme.name_en));
+                const kwText = escapeHtml((theme.keywords || []).join(', '));
+                const count = Number.isFinite(theme.count) ? theme.count : '';
+                html += `
+                    <div class="p-3 ${style.bg} rounded-xl border ${style.border} shadow-sm flex flex-col justify-between">
+                        <div class="flex justify-between items-start mb-2 gap-2">
+                            <span class="font-bold ${style.text} text-xs leading-snug">${title}</span>
+                            <span class="${style.badgeBg} ${style.text} py-0.5 px-2.5 rounded-full text-[10px] font-black shrink-0">${count}</span>
+                        </div>
+                        <p class="text-[9px] ${style.kwText} uppercase tracking-wider font-bold mt-1 leading-tight line-clamp-2" title="${kwText}">${keywordsLabel} ${kwText}</p>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            return html;
+        }
+
+        function renderAiSection(containerId, aiResult, styleOffset, opts) {
+            const t = i18n[currentLang];
+            const summary = escapeHtml(currentLang === 'en' ? aiResult.summary_en : (aiResult.summary_lo || aiResult.summary_en));
+            const themes = Array.isArray(aiResult.themes) ? aiResult.themes : [];
+
+            const themeHtml = renderAiThemeCards(themes, styleOffset, t.keywordsLabel, opts.modBase);
+
+            const quotesHtml = themes
+                .filter(th => th.example_quote)
+                .map(th => `<p class="text-slate-800 italic font-medium leading-relaxed mb-4 pb-4 border-b ${opts.borderColor} last:mb-0 last:pb-0 last:border-0">"${escapeHtml(th.example_quote)}"</p>`)
+                .join('');
+
+            const quotesBoxHtml = quotesHtml
+                ? `<div class="mt-4 p-5 bg-gradient-to-r ${opts.gradient} rounded-xl border ${opts.boxBorder} shadow-inner"><p class="text-[10px] font-bold ${opts.accentText} uppercase tracking-widest mb-3 flex items-center gap-2">${opts.icon}${t.aiThemeQuotesLabel}</p>${quotesHtml}</div>`
+                : '';
+
+            document.getElementById(containerId).innerHTML = `
+                <p class="leading-relaxed">${summary}</p>
+                ${themeHtml}
+                ${quotesBoxHtml}
+            `;
+        }
+
+        function mapAiError(err, t) {
+            const msg = err?.message || '';
+            if (msg === 'MISSING_KEY') return t.aiMissingKey;
+            if (msg === 'NO_DATA') return t.aiNoData;
+            if (msg.startsWith('API_ERROR:404')) return t.aiErrorModel;
+            if (msg.startsWith('API_ERROR:400') || msg.startsWith('API_ERROR:403')) return t.aiErrorKey;
+            if (msg.startsWith('API_ERROR:429')) return t.aiErrorRateLimit;
+            if (msg === 'PARSE_ERROR' || msg === 'EMPTY_RESPONSE') return t.aiErrorParse;
+            return t.aiErrorGeneric;
+        }
+
+        async function generateAllAiThemes() {
+            const t = i18n[currentLang];
+            const btn = document.getElementById('ai-generate-btn');
+            const status = document.getElementById('ai-status');
+
+            btn.disabled = true;
+            status.textContent = t.aiGenerating;
+            status.className = 'text-xs text-indigo-500 mt-2 animate-pulse';
+
+            try {
+                const data = getFilteredData();
+                const texts1 = data.map(x => x[COL.exampleApplied]).filter(q => q && q.length > 15);
+                const texts2 = data.map(x => x[COL.whyNotApplied]).filter(q => q && q.length > 15);
+                const texts3 = data.map(x => x[COL.supportNeeded]).filter(q => q && q.length > 15);
+
+                const [r1, r2, r3] = await Promise.all([
+                    callGeminiForThemes(texts1, 'How respondents applied newly learned skills/knowledge in their work.'),
+                    callGeminiForThemes(texts2, 'Why respondents were unable to apply skills/knowledge in their work.'),
+                    callGeminiForThemes(texts3, 'What support respondents need to apply skills/knowledge in their work.')
+                ]);
+
+                const sparkleIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M3 12h4M12 21v-4M21 12h-4M5.6 5.6l2.8 2.8M18.4 5.6l-2.8 2.8M5.6 18.4l2.8-2.8M18.4 18.4l-2.8-2.8"/></svg>';
+
+                renderAiSection('ai-summary', r1, 0, {
+                    borderColor: 'border-purple-200/50', gradient: 'from-purple-50 to-indigo-50',
+                    boxBorder: 'border-purple-100', accentText: 'text-purple-500', icon: sparkleIcon
+                });
+                renderAiSection('ai-summary-2', r2, 4, {
+                    modBase: 6, borderColor: 'border-rose-200/50', gradient: 'from-rose-50 to-red-50',
+                    boxBorder: 'border-rose-100', accentText: 'text-rose-500', icon: sparkleIcon
+                });
+                renderAiSection('ai-summary-3', r3, 8, {
+                    modBase: 6, borderColor: 'border-teal-200/50', gradient: 'from-teal-50 to-emerald-50',
+                    boxBorder: 'border-teal-100', accentText: 'text-teal-500', icon: sparkleIcon
+                });
+
+                status.textContent = t.aiSuccess;
+                status.className = 'text-xs text-emerald-600 mt-2';
+            } catch (err) {
+                console.error(err);
+                status.textContent = mapAiError(err, t);
+                status.className = 'text-xs text-red-500 mt-2';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // -------------------------------------------------------------
+        // EXPORT (Excel analysis workbook, Word narrative report)
+        // Reads whatever is currently rendered in the theme cards / quote
+        // lists, so the export always matches what's on screen regardless
+        // of whether it came from the local-keyword, AI, or local-auto mode.
+        // -------------------------------------------------------------
+
+        function extractSectionData(summaryId, quotesContainerId) {
+            const summaryEl = document.getElementById(summaryId);
+            const summaryText = summaryEl.querySelector('p')?.innerText || '';
+
+            const themes = [...summaryEl.querySelectorAll('.grid > div')].map(card => ({
+                name: card.querySelector('.font-bold')?.innerText.trim() || '',
+                count: card.querySelector('.rounded-full')?.innerText.trim() || '',
+                keywords: card.querySelector('p[title]')?.getAttribute('title') || ''
+            }));
+
+            const quotesEl = document.getElementById(quotesContainerId);
+            const quotes = [...quotesEl.children]
+                .map(div => div.querySelector('p')?.innerText.replace(/^"|"$/g, '') || '')
+                .filter(Boolean);
+
+            return { summaryText, themes, quotes };
+        }
+
+        function getExportSections() {
+            return [
+                { summaryId: 'ai-summary', quotesId: 'quotes-container', titleKey: 'sec1Title' },
+                { summaryId: 'ai-summary-2', quotesId: 'quotes-container-2', titleKey: 'sec2Title' },
+                { summaryId: 'ai-summary-3', quotesId: 'quotes-container-3', titleKey: 'sec3Title' }
+            ];
+        }
+
+        function exportToExcel() {
+            if (rawData.length === 0) {
+                showMessage(i18n[currentLang].exportNoData, 'error');
+                return;
+            }
+
+            const t = i18n[currentLang];
+            const data = getFilteredData();
+            const male = data.filter(d => d[COL.gender]?.toLowerCase() === 'male' || d[COL.gender] === 'ຊາຍ').length;
+            const applied = data.filter(d => ['yes', 'ແມ່ນ', 'y'].includes((d[COL.appliedSkill] || '').trim().toLowerCase())).length;
+
+            const wb = XLSX.utils.book_new();
+
+            const summaryRows = [
+                [t.reportMetric, t.reportValue],
+                [t.reportTotalRespondents, data.length],
+                [t.male, male],
+                [t.female, data.length - male],
+                [t.reportAppliedSkills, applied],
+                [t.no, data.length - applied],
+                [t.reportGenerated, new Date().toLocaleString()]
+            ];
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryRows), 'Summary');
+
+            getExportSections().forEach((sec, i) => {
+                const { summaryText, themes, quotes } = extractSectionData(sec.summaryId, sec.quotesId);
+                const rows = [
+                    ['Narrative Summary'], [summaryText], [],
+                    ['Theme', 'Count', 'Keywords'],
+                    ...themes.map(th => [th.name, th.count, th.keywords]),
+                    [], ['Representative Quotes'],
+                    ...quotes.map(q => [q])
+                ];
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), `Section${i + 1}`);
+            });
+
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Filtered_Data');
+
+            XLSX.writeFile(wb, `FUAT_Analysis_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        }
+
+        function exportToWord() {
+            if (rawData.length === 0) {
+                showMessage(i18n[currentLang].exportNoData, 'error');
+                return;
+            }
+
+            const t = i18n[currentLang];
+            const data = getFilteredData();
+            const male = data.filter(d => d[COL.gender]?.toLowerCase() === 'male' || d[COL.gender] === 'ຊາຍ').length;
+            const applied = data.filter(d => ['yes', 'ແມ່ນ', 'y'].includes((d[COL.appliedSkill] || '').trim().toLowerCase())).length;
+            const appliedPct = data.length > 0 ? Math.round((applied / data.length) * 100) : 0;
+
+            let sectionsHtml = '';
+            getExportSections().forEach(sec => {
+                const { summaryText, themes, quotes } = extractSectionData(sec.summaryId, sec.quotesId);
+                const themeListHtml = themes.map(th =>
+                    `<li><b>${escapeHtml(th.name)}</b> (${escapeHtml(th.count)}) &mdash; <i>${escapeHtml(th.keywords)}</i></li>`
+                ).join('');
+                const quotesHtml = quotes.map(q => `<blockquote>&ldquo;${escapeHtml(q)}&rdquo;</blockquote>`).join('');
+
+                sectionsHtml += `
+                    <h2>${escapeHtml(t[sec.titleKey])}</h2>
+                    <p>${escapeHtml(summaryText)}</p>
+                    <h3>${escapeHtml(t.reportThemesHeading)}</h3>
+                    <ul>${themeListHtml || `<li>${escapeHtml(t.reportNoThemes)}</li>`}</ul>
+                    <h3>${escapeHtml(t.reportQuotesHeading)}</h3>
+                    ${quotesHtml || `<p><i>${escapeHtml(t.reportNoQuotes)}</i></p>`}
+                `;
+            });
+
+            const html = `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8">
+<title>${escapeHtml(t.reportTitle)}</title>
+<style>
+    body { font-family: Calibri, 'Noto Sans Lao', sans-serif; font-size: 11pt; color: #1e293b; }
+    h1 { font-size: 22pt; margin-bottom: 4pt; }
+    h2 { font-size: 16pt; color: #1d4ed8; margin-top: 22pt; border-bottom: 1px solid #cbd5e1; padding-bottom: 4pt; }
+    h3 { font-size: 12pt; color: #334155; margin-top: 12pt; }
+    blockquote { border-left: 3px solid #cbd5e1; padding-left: 10pt; font-style: italic; color: #475569; margin: 6pt 0; }
+    .meta { color: #64748b; font-size: 9pt; margin-bottom: 18pt; }
+    table { border-collapse: collapse; }
+    td, th { border: 1px solid #cbd5e1; padding: 4pt 8pt; }
+</style>
+</head>
+<body>
+    <h1>${escapeHtml(t.reportTitle)}</h1>
+    <p class="meta">${escapeHtml(t.reportGenerated)}: ${escapeHtml(new Date().toLocaleString())} | ${escapeHtml(t.reportRespondents)}: ${data.length}</p>
+    <table>
+        <tr><th>${escapeHtml(t.reportMetric)}</th><th>${escapeHtml(t.reportValue)}</th></tr>
+        <tr><td>${escapeHtml(t.reportTotalRespondents)}</td><td>${data.length}</td></tr>
+        <tr><td>${escapeHtml(t.reportGenderSplit)}</td><td>${male} / ${data.length - male}</td></tr>
+        <tr><td>${escapeHtml(t.reportAppliedSkills)}</td><td>${applied} (${appliedPct}%)</td></tr>
+    </table>
+    ${sectionsHtml}
+</body>
+</html>`;
+
+            const blob = new Blob(['﻿', html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `FUAT_Narrative_Report_${new Date().toISOString().slice(0, 10)}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // -------------------------------------------------------------
+        // USER GUIDE MODAL
+        // -------------------------------------------------------------
+
+        function openGuideModal() {
+            document.getElementById('guide-content').innerHTML = currentLang === 'en' ? getGuideContentEn() : getGuideContentLo();
+            document.getElementById('guide-modal').classList.remove('hidden');
+        }
+
+        function closeGuideModal() {
+            document.getElementById('guide-modal').classList.add('hidden');
+        }
+
+        function guideSection(title, bodyHtml) {
+            return `<div class="mb-6"><h3 class="text-lg font-bold text-blue-700 mb-2 pb-1 border-b border-slate-100">${title}</h3><div class="text-sm space-y-2">${bodyHtml}</div></div>`;
+        }
+        function guideSubheading(text) {
+            return `<h4 class="text-sm font-bold text-slate-800 mt-3 mb-1">${text}</h4>`;
+        }
+        function guideList(items) {
+            return `<ul class="list-disc list-inside space-y-1">${items.map(i => `<li>${i}</li>`).join('')}</ul>`;
+        }
+        function guideNumbered(items) {
+            return `<ol class="list-decimal list-inside space-y-1">${items.map(i => `<li>${i}</li>`).join('')}</ol>`;
+        }
+        function guideTip(label, text, variant) {
+            const styles = {
+                amber: 'bg-amber-50 border-amber-100 text-amber-700',
+                green: 'bg-emerald-50 border-emerald-100 text-emerald-700',
+                blue: 'bg-blue-50 border-blue-100 text-blue-700'
+            };
+            const cls = styles[variant] || styles.blue;
+            return `<div class="mt-2 p-3 ${cls} border rounded-lg text-xs"><b>${label}</b> ${text}</div>`;
+        }
+        function guideTable(headers, rows) {
+            const headHtml = headers.map(h => `<th class="text-left p-2 bg-slate-50 border border-slate-200 font-bold">${h}</th>`).join('');
+            const rowsHtml = rows.map(r => `<tr>${r.map(c => `<td class="p-2 border border-slate-200 align-top">${c}</td>`).join('')}</tr>`).join('');
+            return `<div class="overflow-x-auto"><table class="w-full text-xs border-collapse mt-2"><thead><tr>${headHtml}</tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
+        }
+
+        function getGuideContentLo() {
+            return `
+                ${guideSection('1. ພາບລວມ', `
+                    <p>FUAT Dashboard ແມ່ນເຄື່ອງມືວິເຄາະຂໍ້ມູນແບບໄຟລ໌ດຽວ ໃຊ້ວິເຄາະແບບສອບຖາມຕິດຕາມພາຍຫຼັງການຝຶກອົບຮົມ. ອັບໂຫລດ Excel/CSV, ກັ່ນຕອງ, ວິເຄາະ ແລະ ສົ່ງອອກຜົນໄດ້ໂດຍກົງໃນ browser — ບໍ່ຕ້ອງຕິດຕັ້ງໂປຣແກຣມ ຫຼືອິນເຕີເນັດ (ຍົກເວັ້ນຖ້າໃຊ້ AI).</p>
+                `)}
+                ${guideSection('2. ການອັບໂຫລດຂໍ້ມູນ', `
+                    <p>ກົດ "ອັບໂຫລດ Excel" ແລ້ວເລືອກໄຟລ໌ .xlsx, .xls ຫຼື .csv. ລະບົບຮັບຮູ້ຫົວຄໍລໍາທີ່ມີໝາຍເລກຄຳຖາມນຳໜ້າ (ເຊັ່ນ "203. Please select the province...") ໂດຍອັດຕະໂນມັດ.</p>
+                    ${guideTip('ແຈ້ງເຕືອນສີເຫຼືອງ:', 'ບໍ່ພົບບາງຄໍລໍາ — dashboard ຍັງໃຊ້ໄດ້ ແຕ່ບາງສະຖິຕິອາດເປັນ 0', 'amber')}
+                    ${guideTip('ແຈ້ງເຕືອນສີແດງ:', 'ໄຟລ໌ຫວ່າງເປົ່າ ຫຼືອ່ານບໍ່ໄດ້ — ກະລຸນາກວດສອບໄຟລ໌', 'amber')}
+                `)}
+                ${guideSection('3. ຕົວກັ່ນຕອງ (Filter) — ເລືອກໄດ້ຫຼາຍຄ່າພ້ອມກັນ', `
+                    ${guideList([
+                        '<b>Province / District</b> — ແຂວງ ແລະ ເມືອງ (District ຈະສະແດງສະເພາະໃນແຂວງທີ່ເລືອກ)',
+                        '<b>Training (207) / Training Option (Q207)</b> — ຫົວຂໍ້ຝຶກອົບຮົມທີ່ໄດ້ຮັບ',
+                        '<b>Other Training (207a)</b> — ຊື່ຫົວຂໍ້ທີ່ລະບຸເອງເມື່ອເລືອກ "ອື່ນໆ"',
+                        '<b>Facility Type (205)</b> — ປະເພດສະຖານທີ່ເຮັດວຽກ'
+                    ])}
+                    <p>ກົດທີ່ກ່ອງ Filter ເພື່ອເປີດ, ຕິກ checkbox ຫຼາຍອັນໄດ້, ກົດ "Clear" ເພື່ອລ້າງ.</p>
+                    ${guideTip('ຫມາຍເຫດ:', 'ພາຍໃນ Filter ດຽວກັນ = ເງື່ອນໄຂ "ຫຼື", ລະຫວ່າງ Filter ຕ່າງກັນ = ເງື່ອນໄຂ "ແລະ"', 'blue')}
+                `)}
+                ${guideSection('4. ການອ່ານຜົນ Dashboard', `
+                    ${guideList([
+                        '<b>ການແບ່ງເພດ</b> — ຈຳນວນ ແລະ % ຊາຍ/ຍິງ',
+                        '<b>ການນຳໃຊ້ທັກສະ</b> — ຈຳນວນ ແລະ % ຜູ້ຕອບ "ແມ່ນ"/"ບໍ່"'
+                    ])}
+                `)}
+                ${guideSection('5. ການວິເຄາະຄຸນນະພາບ (3 ວິທີ)', `
+                    ${guideSubheading('5.1 Themes ແບບກຳນົດໄວ້ລ່ວງໜ້າ (ຄ່າເລີ່ມຕົ້ນ)')}
+                    <p>ສະແດງທັນທີຫຼັງອັບໂຫລດ, ໃຊ້ຄຳສຳຄັນທີ່ກຳນົດໄວ້ລ່ວງໜ້າສະເພາະໂຄງການ, ບໍ່ຕ້ອງໃຊ້ອິນເຕີເນັດ.</p>
+                    ${guideSubheading('5.2 ວິເຄາະດ້ວຍ AI (Google Gemini)')}
+                    <p>ວາງ Gemini API Key (ເອົາໄດ້ຟຣີຈາກ aistudio.google.com/apikey) ໃນຊ່ອງທີ່ກຳນົດ ແລ້ວກົດ "ໃຫ້ AI ວິເຄາະ Themes"</p>
+                    ${guideTip('ຂໍ້ຈຳກັດ:', 'Key ຖືກເກັບໄວ້ໃນ browser ຂອງທ່ານເທົ່ານັ້ນ, ບໍ່ຝັງໄວ້ໃນໄຟລ໌. ຢ່າແບ່ງປັນໄຟລ໌/browser ໃຫ້ຄົນອື່ນຫຼັງໃສ່ Key. ປ່ຽນ Filter ຈະກັບຄືນສູ່ Themes ແບບກຳນົດໄວ້ລ່ວງໜ້າ.', 'amber')}
+                    ${guideSubheading('5.3 ຄົ້ນຫາ Themes ອັດຕະໂນມັດ (Local, ບໍ່ໃຊ້ອິນເຕີເນັດ)')}
+                    <p>ສະແກນຫາຄຳ/ປະໂຫຍກທີ່ພົບເລື້ອຍ ໂດຍບໍ່ຕ້ອງໃຊ້ AI. ຄຸນນະພາບອາດບໍ່ເທົ່າ AI ເນື່ອງຈາກພາສາລາວບໍ່ມີຊ່ອງຫວ່າງລະຫວ່າງຄຳ.</p>
+                `)}
+                ${guideSection('6. ການສົ່ງອອກ (Export)', `
+                    ${guideTable(['ວິທີ', 'ອະທິບາຍ'], [
+                        ['Export Excel', 'ໄຟລ໌ .xlsx ມີ 5 sheet: Summary, Section1-3 (Theme+ຄຳຕອບ), Filtered_Data'],
+                        ['Export Word', 'ໄຟລ໌ .doc ຮູບແບບບົດລາຍງານ (Narrative Report) — Word ເປີດໄດ້ໂດຍກົງ'],
+                        ['Print / PDF', 'ພິມ ຫຼືບັນທຶກເປັນ PDF ຜ່ານໜ້າຕ່າງພິມຂອງ browser']
+                    ])}
+                    ${guideTip('ສຳຄັນ:', 'Export ຈະດຶງຂໍ້ມູນຈາກສິ່ງທີ່ກຳລັງສະແດງຢູ່ໜ້າຈໍ (Theme ແບບໃດກໍໄດ້ທີ່ເລືອກໄວ້) ແລະ Filter ປັດຈຸບັນ', 'green')}
+                `)}
+                ${guideSection('7. ການແກ້ໄຂບັນຫາທົ່ວໄປ', `
+                    ${guideTable(['ບັນຫາ', 'ວິທີແກ້'], [
+                        ['ສະຖິຕິເປັນ 0 ທັງໝົດ', 'ກວດຄໍລໍາໃນໄຟລ໌ Excel ໃຫ້ກົງກັບແບບຟອມທີ່ຄາດໄວ້'],
+                        ['AI ວິເຄາະບໍ່ໄດ້', 'ກວດ API Key / ຊື່ Model, ຫຼືລໍຖ້າຖ້າຮອດຂີດຈຳກັດການນຳໃຊ້'],
+                        ['ບໍ່ມີຄຳຕອບໃຫ້ວິເຄາະ', 'ລອງລ້າງ Filter ບາງອັນ'],
+                        ['Export ບໍ່ໄດ້', 'ຕ້ອງອັບໂຫລດຂໍ້ມູນກ່ອນ']
+                    ])}
+                `)}
+            `;
+        }
+
+        function getGuideContentEn() {
+            return `
+                ${guideSection('1. Overview', `
+                    <p>FUAT Dashboard is a single-file tool for analyzing Follow-Up After Training surveys. Upload Excel/CSV, filter, analyze, and export &mdash; all directly in your browser, no install and no internet required (except when using AI).</p>
+                `)}
+                ${guideSection('2. Uploading Data', `
+                    <p>Click "Upload Excel" and select an .xlsx, .xls, or .csv file. The system automatically recognizes column headers with a leading question number (e.g. "203. Please select the province...").</p>
+                    ${guideTip('Yellow warning:', 'Some expected columns were not found &mdash; the dashboard still works, but some stats may show 0', 'amber')}
+                    ${guideTip('Red error:', 'The file is empty or unreadable &mdash; please check the file', 'amber')}
+                `)}
+                ${guideSection('3. Filters (multi-select)', `
+                    ${guideList([
+                        '<b>Province / District</b> &mdash; District options narrow to the selected province(s)',
+                        '<b>Training (207) / Training Option (Q207)</b> &mdash; training received',
+                        '<b>Other Training (207a)</b> &mdash; free-text specify when "Other" is selected',
+                        '<b>Facility Type (205)</b> &mdash; type of work location'
+                    ])}
+                    <p>Click a filter box to open it, check as many values as needed, click "Clear" to reset.</p>
+                    ${guideTip('Note:', 'Within one filter, multiple selections are combined with OR. Across different filters, it is AND.', 'blue')}
+                `)}
+                ${guideSection('4. Reading the Dashboard', `
+                    ${guideList([
+                        '<b>Gender Distribution</b> &mdash; count and % male/female',
+                        '<b>Skill Usage</b> &mdash; count and % who answered Yes/No'
+                    ])}
+                `)}
+                ${guideSection('5. Qualitative Analysis (3 modes)', `
+                    ${guideSubheading('5.1 Predefined Themes (default)')}
+                    <p>Shown immediately after upload, using project-specific predefined keywords. No internet required.</p>
+                    ${guideSubheading('5.2 AI Analysis (Google Gemini)')}
+                    <p>Paste a Gemini API key (free at aistudio.google.com/apikey) into the field provided, then click "Generate AI Themes".</p>
+                    ${guideTip('Limitation:', 'The key is stored only in your browser, never embedded in the file. Do not share the file or browser profile after entering a key. Changing filters reverts to the predefined themes.', 'amber')}
+                    ${guideSubheading('5.3 Local Auto-Discover Themes (offline)')}
+                    <p>Scans for frequently recurring words/phrases without AI. Quality may be lower than AI since Lao script has no spaces between words.</p>
+                `)}
+                ${guideSection('6. Exporting', `
+                    ${guideTable(['Method', 'Description'], [
+                        ['Export Excel', '.xlsx with 5 sheets: Summary, Section1-3 (themes+quotes), Filtered_Data'],
+                        ['Export Word', '.doc narrative report, opens directly in Word'],
+                        ['Print / PDF', 'Print or save as PDF via the browser print dialog']
+                    ])}
+                    ${guideTip('Important:', 'Exports reflect whatever is currently displayed on screen (any theme mode) and the currently applied filters.', 'green')}
+                `)}
+                ${guideSection('7. Troubleshooting', `
+                    ${guideTable(['Issue', 'Fix'], [
+                        ['All stats show 0', 'Check that your Excel columns match the expected format'],
+                        ['AI analysis fails', 'Check your API key / model name, or wait if rate-limited'],
+                        ['No responses to analyze', 'Try clearing some filters'],
+                        ['Export does not work', 'Data must be uploaded first']
+                    ])}
+                `)}
+            `;
+        }
+
+        window.onload = function() {
+            updateUI();
+            loadGeminiSettings();
+        };
     </script>
 </body>
 </html>
