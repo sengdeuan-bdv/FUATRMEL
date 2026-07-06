@@ -93,6 +93,28 @@
             /* Reduce top margin for printing */
             body { padding: 0 !important; }
             .max-w-6xl { max-width: 100% !important; margin: 0 !important; }
+
+            /* Guide modal: hidden during a normal dashboard print, shown (exclusively) when printing the guide itself */
+            #guide-modal { display: none !important; }
+            body.printing-guide > .max-w-6xl { display: none !important; }
+            body.printing-guide #guide-modal {
+                display: block !important;
+                position: static !important;
+                background: none !important;
+                padding: 0 !important;
+            }
+            body.printing-guide #guide-modal > div {
+                max-height: none !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+            }
+            body.printing-guide #guide-content {
+                overflow: visible !important;
+                max-height: none !important;
+            }
+            body.printing-guide .guide-print-hide {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -403,13 +425,19 @@
     </div>
 
     <!-- User Guide Modal -->
-    <div id="guide-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 no-print" onclick="if(event.target===this) closeGuideModal()">
+    <div id="guide-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="if(event.target===this) closeGuideModal()">
         <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col">
-            <div class="flex items-center justify-between p-6 border-b border-slate-100 shrink-0">
+            <div class="guide-print-hide flex items-center justify-between p-6 border-b border-slate-100 shrink-0">
                 <h2 id="ui-guide-title" class="text-xl font-bold text-slate-800">User Guide</h2>
-                <button onclick="closeGuideModal()" class="text-slate-400 hover:text-slate-700 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
+                <div class="flex items-center gap-3">
+                    <button onclick="printGuide()" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all font-semibold text-slate-700 flex items-center gap-2 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                        <span id="ui-guide-export-pdf-btn">Export PDF</span>
+                    </button>
+                    <button onclick="closeGuideModal()" class="text-slate-400 hover:text-slate-700 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
             </div>
             <div id="guide-content" class="p-6 overflow-y-auto text-slate-700 leading-relaxed"></div>
         </div>
@@ -661,6 +689,7 @@
                 exportWordBtn: "Export Word",
                 guideBtn: "User Guide",
                 guideTitle: "User Guide",
+                guideExportPdfBtn: "Export PDF",
                 exportNoData: "Please upload data first before exporting.",
                 reportTitle: "FUAT Dashboard — Narrative Report",
                 reportGenerated: "Generated",
@@ -759,6 +788,7 @@
                 exportWordBtn: "ສົ່ງອອກ Word",
                 guideBtn: "ຄູ່ມືການນຳໃຊ້",
                 guideTitle: "ຄູ່ມືການນຳໃຊ້",
+                guideExportPdfBtn: "ສົ່ງອອກ PDF",
                 exportNoData: "ກະລຸນາອັບໂຫລດຂໍ້ມູນກ່ອນສົ່ງອອກ.",
                 reportTitle: "ກະດານສະແດງຜົນ FUAT — ບົດລາຍງານ",
                 reportGenerated: "ສ້າງເມື່ອ",
@@ -870,6 +900,7 @@
             document.getElementById('ui-export-word-btn').innerText = t.exportWordBtn;
             document.getElementById('ui-guide-btn').innerText = t.guideBtn;
             document.getElementById('ui-guide-title').innerText = t.guideTitle;
+            document.getElementById('ui-guide-export-pdf-btn').innerText = t.guideExportPdfBtn;
             document.getElementById('ui-filter-province').innerText = t.province;
             document.getElementById('ui-filter-district').innerText = t.district;
             document.getElementById('ui-filter-training').innerText = t.filterTraining;
@@ -1728,6 +1759,15 @@ Respond with JSON only, matching this schema:
         function closeGuideModal() {
             document.getElementById('guide-modal').classList.add('hidden');
         }
+
+        function printGuide() {
+            document.body.classList.add('printing-guide');
+            window.print();
+        }
+
+        window.addEventListener('afterprint', () => {
+            document.body.classList.remove('printing-guide');
+        });
 
         function guideSection(title, bodyHtml) {
             return `<div class="mb-6"><h3 class="text-lg font-bold text-blue-700 mb-2 pb-1 border-b border-slate-100">${title}</h3><div class="text-sm space-y-2">${bodyHtml}</div></div>`;
